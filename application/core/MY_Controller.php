@@ -69,17 +69,14 @@ class MY_Controller extends CI_Controller {
 	}
 
 	protected function addErrors($message) {
-		$this->session->set_flashdata('errors', $message);
 		$this->layout->assign('errors', $message);
 	}
 
 	protected function addSuccess($message) {
-		$this->session->set_flashdata('success', $message);
 		$this->layout->assign('success', $message);
 	}
 
 	protected function addWarnings($message) {
-		$this->session->set_flashdata('success', $message);
 		$this->layout->assign('warnings', $message);
 	}
 	
