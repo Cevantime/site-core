@@ -16,7 +16,7 @@ if (!defined('BASEPATH'))
 class home extends BO_Controller {
 
 	public function index() {
-		
+		$this->layout->view('bo/home');
 	}
 
 }

@@ -19,7 +19,9 @@ and open the template in the editor.
         <title><?php echo $title_for_layout ?></title>
     </head>
     <body>
-        <div id="conteneur">
+<!-- ACTIVATE THIS IF YOU HAVE BOOTSRAP INSTALLED. OTHERWISE YOU CAN JUST DROP IT !        
+
+	<div id="conteneur">
 			<?php if (isset($errors)): ?>
 				<div class="alert alert-error">
 					<button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -81,7 +83,7 @@ and open the template in the editor.
 							.modal('show');
 				});
 			});
-            </script>
+            </script>-->
             <div><?php echo $content_for_layout ?></div>
 
         </div> <!--  le conteneur principal -->
