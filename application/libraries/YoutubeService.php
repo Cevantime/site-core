@@ -12,13 +12,12 @@
  */
 
 
-require_once APPPATH . '/../php/google-api-php-client/src/Google_Client.php';
-require_once APPPATH . '/../php/google-api-php-client/src/contrib/Google_YouTubeService.php';
-require_once APPPATH . '/../php/youtube_downloader/Youtube.php';
+require_once APPPATH . '/third_party/google-api-php-client/src/Google_Client.php';
+require_once APPPATH . '/third_party/google-api-php-client/src/contrib/Google_YouTubeService.php';
+require_once APPPATH . '/third_party/youtube_downloader/Youtube.php';
 class YoutubeService extends Google_YouTubeService {
 
 	//put your code here
-
 	public function __construct() {
 
 		$client = new Google_Client(array('authClass' => 'Google_OAuth2'));

@@ -11,7 +11,7 @@
         <script type="text/javascript" src="<?php echo base_url() ?>js/pagination.js"></script>
         <script type="text/javascript" src="<?php echo base_url() ?>js/homeSlider.js"></script>
         <script type="text/javascript" src="<?php echo base_url() ?>js/homePopup.js"></script>
- 
+		<link rel="stylesheet" href="<?php echo base_url('css/stylesheet.css'); ?>"></link>
 		<?php echo $css_for_layout ?>
 		<?php echo $js_for_layout ?>
 		

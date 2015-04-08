@@ -19,22 +19,6 @@ class BO_Controller extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		
-		$this->load->library('layout');
-		
-		if(isset($this->session)) {
-			$errors = $this->session->flashdata('errors');
-			if ($errors) {
-				$this->layout->assign('errors', $errors);
-			}
-			$warnings = $this->session->flashdata('warnings');
-			if ($warnings) {
-				$this->layout->assign('warnings', $warnings);
-			}
-			$success = $this->session->flashdata('success');
-			if ($success) {
-				$this->layout->assign('success', $success);
-			}
-		}
 	}
 	protected function pagination($model, $start, $offset = 10, $methodName = 'getList') {
 		$this->load->model($model);

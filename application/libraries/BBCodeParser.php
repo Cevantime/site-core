@@ -8,9 +8,9 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
-require_once APPPATH . '/../php/jbbcode-1.2.0/Parser.php';
-require_once APPPATH . '/../php/jbbcode-1.2.0/SpecialCode.php';
-require_once APPPATH . '/../php/jbbcode-1.2.0/visitors/SmileyVisitor.php';
+require_once APPPATH . '/third_party/jbbcode-1.2.0/Parser.php';
+require_once APPPATH . '/third_party/jbbcode-1.2.0/SpecialCode.php';
+require_once APPPATH . '/third_party/jbbcode-1.2.0/visitors/SmileyVisitor.php';
 
 class BBCodeParser extends JBBCode\Parser {
 

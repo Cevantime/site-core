@@ -8,30 +8,7 @@ class MY_Controller extends CI_Controller {
 	public function __construct() {
 		parent::__construct();
 		// Layout library loaded site wide
-		$this->load->library('layout');
-		// Site global resources
-		if(isset($this->session)) {
-			$errors = $this->session->flashdata('errors');
-			if ($errors) {
-				$this->session->set_flashdata('errors',null);
-				$this->layout->assign('errors', $errors);
-			}
-			$warnings = $this->session->flashdata('warnings');
-			if ($warnings) {
-				$this->session->set_flashdata('warnings',null);
-				$this->layout->assign('warnings', $warnings);
-			}
-			$success = $this->session->flashdata('success');
-			if ($success) {
-				$this->session->set_flashdata('success',null);
-				$this->layout->assign('success', $success);
-			}
-
-			if($this->session->userdata("layout")){
-				$this->layout_view = 'layout/default';
-			}
-		}
-		$this->layout->assign('url_string', $this->uri->uri_string());
+		$this->layout->assign('uri_string', $this->uri->uri_string());
 		$this->breadcrumb();
 	}
 
