@@ -18,7 +18,10 @@ class BO_Controller extends CI_Controller {
 
 	public function __construct() {
 		parent::__construct();
-		
+		$this->load->model('user');
+		if($this->session->user_id){
+			$this->user->load($this->session->user_id);
+		}
 	}
 	protected function pagination($model, $start, $offset = 10, $methodName = 'getList') {
 		$this->load->model($model);
@@ -64,7 +67,6 @@ class BO_Controller extends CI_Controller {
 	protected function addWarnings($message) {
 		$this->layout->assign('warnings', $message);
 	}
-
 }
 
 ?>

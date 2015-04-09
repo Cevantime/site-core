@@ -91,7 +91,7 @@ and open the template in the editor.
   <!--[if (gt IE 9)|!(IE)]><!--> 
    
   <!--<![endif]-->
-
+  
     <div class="navbar navbar-default" role="navigation">
         <div class="navbar-header">
           <a class="" href="index.html"><span class="navbar-brand"><span class="fa fa-paper-plane"></span> Admin Core</span></a></div>
@@ -100,33 +100,8 @@ and open the template in the editor.
 
         </div>
       </div>
-    </div>
-    
 
-
-        <div class="dialog">
-    <div class="panel panel-default">
-        <p class="panel-heading no-collapse">Sign In</p>
-        <div class="panel-body">
-            <form>
-                <div class="form-group">
-                    <label>Nom d'utilisateur</label>
-                    <input type="text" class="form-control span12">
-                </div>
-                <div class="form-group">
-                <label>Mot de Passe</label>
-                    <input type="password" class="form-control span12 form-control">
-                </div>
-                <a href="index.html" class="btn btn-primary pull-right">Sign In</a>
-                <label class="remember-me"><input type="checkbox"> Remember me</label>
-                <div class="clearfix"></div>
-            </form>
-        </div>
-    </div>
-    <p><a href="reset-password.html">Forgot your password?</a></p>
-</div>
-
-
+	  <?php echo $content_for_layout ?>
 
     <script src="<?php echo base_url('lib/bootstrap/js/bootstrap.js') ?>"></script>
     <script type="text/javascript">

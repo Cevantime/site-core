@@ -16,6 +16,9 @@ if (!defined('BASEPATH'))
 class Home extends BO_Controller {
 
 	public function index() {
+		if(!$this->user->can('access','backoffice')){
+			redirect('bo/login');
+		}
 		$this->layout->view('bo/home');
 	}
 
