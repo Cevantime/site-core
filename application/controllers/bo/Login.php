@@ -11,13 +11,16 @@
  *
  * @author thibault
  */
-class Login extends BO_Controller {
+class Login extends CI_Controller {
 	
 	public $layout_view = 'layout/login_bo';
 	
 	public function index() {
-		if($this->user->can('access','backoffice')){
-			redirect('bo/home');
+		if($this->session->user_id){
+			$this->user->load($this->session->user_id);
+			if($this->user->can('access','backoffice')){
+				redirect('bo/home');
+			}
 		}
 		if($this->input->post()){
 			$this->load->library('form_validation');

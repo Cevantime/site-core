@@ -33,7 +33,7 @@ and open the template in the editor.
     </head>
 	<body class=" theme-blue">
 
-    
+
 		<!-- Demo page code -->
 
 		<script type="text/javascript">
@@ -92,8 +92,8 @@ and open the template in the editor.
 		<!--[if (gt IE 9)|!(IE)]><!--> 
 
 		<!--<![endif]-->
-  
-    <div class="navbar navbar-default" role="navigation">
+
+		<div class="navbar navbar-default" role="navigation">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
 					<span class="sr-only">Toggle navigation</span>
@@ -107,7 +107,12 @@ and open the template in the editor.
 				<ul id="main-menu" class="nav navbar-nav navbar-right">
 					<li class="dropdown hidden-xs">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<span class="glyphicon glyphicon-user padding-right-small" style="position:relative;top: 3px;"></span> Jack Smith
+							<span class="glyphicon glyphicon-user padding-right-small" style="position:relative;top: 3px;"></span> 
+							<?php if (!$user->name || !$user->forname): ?>
+								<?php echo $user->login; ?>
+							<?php else: ?>
+								<?php echo $user->name; ?> <?php echo $user->forname; ?>
+							<?php endif; ?>
 							<i class="fa fa-caret-down"></i>
 						</a>
 
@@ -132,8 +137,9 @@ and open the template in the editor.
 			<ul>
 				<li><a href="#" data-target=".dashboard-menu" class="nav-header" data-toggle="collapse"><i class="fa fa-fw fa-dashboard"></i> Dashboard<i class="fa fa-collapse"></i></a></li>
 				<li><ul class="dashboard-menu nav nav-list collapse in">
-						<li><a href="index.html"><span class="fa fa-caret-right"></span> Main</a></li>
-						<li ><a href="users.html"><span class="fa fa-caret-right"></span> User List</a></li>
+						<li><a href="<?php echo base_url('bo/home') ?>"><span class="fa fa-caret-right"></span> Main</a></li>
+						<li ><a href="<?php echo base_url('bo/users') ?>"><span class="fa fa-caret-right"></span> Liste des utilisateurs</a></li>
+						<li ><a href="<?php echo base_url('bo/administrators') ?>"><span class="fa fa-caret-right"></span> Liste des administrateurs</a></li>
 						<li ><a href="user.html"><span class="fa fa-caret-right"></span> User Profile</a></li>
 						<li ><a href="media.html"><span class="fa fa-caret-right"></span> Media</a></li>
 						<li ><a href="calendar.html"><span class="fa fa-caret-right"></span> Calendar</a></li>
@@ -185,15 +191,80 @@ and open the template in the editor.
 
 				<h1 class="page-title">Dashboard</h1>
 				<ul class="breadcrumb">
-					<li><a href="index.html">Home</a> </li>
-					<li class="active">Dashboard</li>
+					<?php foreach ($breadcrumb as $segment => $uri) : ?>
+						<li><a href="<?php echo base_url($uri) ?>"><?php echo $segment ?></a> </li>
+					<?php endforeach; ?>
 				</ul>
 
 			</div>
 			<div class="main-content">
-				
+				<?php if (isset($errors)): ?>
+				<div class="alert alert-error">
+					<button type="button" class="close" data-dismiss="alert">&times;</button>
+					<h4>Error!</h4>
+					<?php foreach ($errors as $error): ?>
+						<?php echo $error; ?>
+					<?php endforeach; ?>
+				</div>
+				<?php endif; ?>
+				<?php if (isset($warnings)): ?>
+					<div class="alert alert-block">
+						<button type="button" class="close" data-dismiss="alert">&times;</button>
+						<h4>Warning!</h4>
+						<?php foreach ($warnings as $warning): ?>
+							<?php echo $warning; ?>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
+				<?php if (isset($success)): ?>
+					<div class="alert alert-success">
+						<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+						<h4>Success!</h4>
+						<?php foreach ($success as $succes): ?>
+							<?php echo $succes; ?>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
 				<?php echo $content_for_layout ?>
-				
+
+				<div id="modal-from-dom" class="modal small fade">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<a href="#" class="close" data-dismiss="modal">&times;</a>
+								<h3></h3>
+							</div>
+							<div class="modal-body">
+
+							</div>
+							<div class="modal-footer">
+								<a href="" class="btn btn-danger">OK</a>
+								<button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script type="text/javascript">
+					$(function () {
+
+						$('.confirm').click(function (e) {
+							var url = $(this).data('url');
+							var body = $(this).data('body');
+							var header = $(this).data('header');
+							var $modal = $('#modal-from-dom');
+							$modal.modal('show');
+							var $removeBtn = $modal.find('.btn-danger');
+							$removeBtn.attr('href', url);
+
+							var $body = $modal.find(".modal-body");
+							$body.html(body);
+							
+							var $header = $modal.find(".modal-header h3");
+							$header.html(header);
+
+						});
+					});
+				</script>
 				<footer>
 					<hr>
 
@@ -206,13 +277,13 @@ and open the template in the editor.
 
 		<script src="<?php echo base_url('lib/bootstrap/js/bootstrap.js') ?>"></script>
 		<script type="text/javascript">
-			$("[rel=tooltip]").tooltip();
-			$(function () {
-				$('.demo-cancel-click').click(function () {
-					return false;
-				});
-			});
+					$("[rel=tooltip]").tooltip();
+					$(function () {
+						$('.demo-cancel-click').click(function () {
+							return false;
+						});
+					});
 		</script>
-    
-  
-</body></html>
+
+
+	</body></html>

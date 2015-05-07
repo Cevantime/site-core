@@ -36,7 +36,7 @@ abstract class DATA_Model extends CI_Model {
 					$res = $querySchema->result();
 					$cols = array();
 					foreach($res as $colInfo){
-						$cols[] = $colInfo->Field;
+						$cols[$table.'.'.$colInfo->Field] = $colInfo->Field;
 					}
 					$this->_extendedSchema = array_merge($this->_extendedSchema, $cols);
 				}
@@ -84,7 +84,7 @@ abstract class DATA_Model extends CI_Model {
 		$cols = $this->getSchema();
 		$datas = array();
 		foreach ($cols as $col) {
-			$colName = $col->COLUMN_NAME;
+			$colName = $col;
 			if (isset($post[$colName]) && $post[$colName]) {
 				$datas[$colName] = $post[$colName];
 			}
@@ -235,6 +235,13 @@ abstract class DATA_Model extends CI_Model {
 		$this->makeExtendingJoins();
 		if ($columns !== null) {
 			$this->db->select($columns);
+		} else if($this->getTableName() !== $this->getBaseTableName()){
+			$columns = array();
+			foreach ($this->getSchema() as $col => $alias) {
+				$columns[] = $col.' AS '.$alias;
+			}
+			$columns = implode(',', $columns);
+			$this->db->select($columns);
 		}
 		$this->db->from($this->getTableName());
 		if ($where !== null) {
@@ -244,6 +251,7 @@ abstract class DATA_Model extends CI_Model {
 		if ($query->num_rows()) {
 			return $query->result($type);
 		}
+		
 		return false;
 	}
 
@@ -481,7 +489,7 @@ abstract class DATA_Model extends CI_Model {
 		if ($limit !== null) {
 			$this->db->limit($offset, $limit);
 		}
-		return $this->get('1', $type);
+		return $this->get(null, $type);
 	}
 
 	public function getListOrderBy($order, $limit = null, $offset = null, $type = 'object') {
@@ -489,7 +497,7 @@ abstract class DATA_Model extends CI_Model {
 		if ($limit !== null) {
 			$this->db->limit($offset, $limit);
 		}
-		return $this->get('1',$type);
+		return $this->get(null,$type);
 	}
 
 	public function count($where = null) {
@@ -689,15 +697,20 @@ abstract class DATA_Model extends CI_Model {
 		}
 	}
 	
-	public function getTrough($table, $value, $key = 'id'){
+	public function getTrough($table, $model, $value, $key = 'id'){
 		$curTable = $this->getTableName();
-		$linkTable = 'links_'.$table.'_'.$curTable;
+		$linkTable = $table;
+		if(is_array($value)){
+			$key = array_keys($value)[0];
+			$value = $value[0];
+		}
 		return $this->get($key.' IN ('
 				. 'SELECT '.substr(strtolower($curTable), 0, strlen($curTable) - 1).'_'.$key.' '
 				. 'FROM '.$linkTable.' '
-				. 'WHERE '.substr(strtolower($table), 0, strlen($table) - 1).'_'.$key.' '
+				. 'WHERE '.$model.'_'.$key.' '
 				. '= '. $this->db->escape($value).')');
 	}
+	
 
 //	private function hasAlias() {
 //		$schema = $this->getSchema();

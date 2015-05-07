@@ -67,6 +67,22 @@ $db['default']['swap_pre'] = '';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
 
+$db['thibault']['hostname'] = 'localhost';
+$db['thibault']['username'] = 'root';
+$db['thibault']['password'] = 'pastor5456';
+$db['thibault']['database'] = 'site-core';
+$db['thibault']['dbdriver'] = 'mysqli';
+$db['thibault']['dbprefix'] = '';
+$db['thibault']['pconnect'] = TRUE;
+$db['thibault']['db_debug'] = TRUE;
+$db['thibault']['cache_on'] = FALSE;
+$db['thibault']['cachedir'] = '';
+$db['thibault']['char_set'] = 'utf8';
+$db['thibault']['dbcollat'] = 'utf8_general_ci';
+$db['thibault']['swap_pre'] = '';
+$db['thibault']['autoinit'] = TRUE;
+$db['thibault']['stricton'] = FALSE;
+
 
 /* End of file database.php */
 /* Location: ./application/config/database.php */
