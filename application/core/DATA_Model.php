@@ -411,8 +411,10 @@ abstract class DATA_Model extends CI_Model {
 						if(array_key_exists($col, $datas))$datasToUpdate[$col] = $datas[$col];
 					}
 				}
-				$this->db->where_in($key, $idsToUpdate);
-				$this->db->update($table, $datasToUpdate);
+				if($datasToUpdate){
+					$this->db->where_in($key, $idsToUpdate);
+					$this->db->update($table, $datasToUpdate);
+				}
 			}
 			return $ret;
 		} else {
