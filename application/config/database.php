@@ -84,8 +84,8 @@ $db['alto']['autoinit'] = TRUE;
 $db['alto']['stricton'] = FALSE;
 
 $db['thibault']['hostname'] = 'localhost';
-$db['thibault']['username'] = 'root';
-$db['thibault']['password'] = 'pastor5456';
+$db['thibault']['username'] = 'site-core';
+$db['thibault']['password'] = 'VFZF8P4xjW8c5hHq';
 $db['thibault']['database'] = 'site-core';
 $db['thibault']['dbdriver'] = 'mysqli';
 $db['thibault']['dbprefix'] = '';
