@@ -67,6 +67,22 @@ $db['default']['swap_pre'] = '';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
 
+$db['alto']['hostname'] = 'localhost';
+$db['alto']['username'] = 'root';
+$db['alto']['password'] = '';
+$db['alto']['database'] = 'core';
+$db['alto']['dbdriver'] = 'mysqli';
+$db['alto']['dbprefix'] = '';
+$db['alto']['pconnect'] = TRUE;
+$db['alto']['db_debug'] = TRUE;
+$db['alto']['cache_on'] = FALSE;
+$db['alto']['cachedir'] = '';
+$db['alto']['char_set'] = 'utf8';
+$db['alto']['dbcollat'] = 'utf8_general_ci';
+$db['alto']['swap_pre'] = '';
+$db['alto']['autoinit'] = TRUE;
+$db['alto']['stricton'] = FALSE;
+
 $db['thibault']['hostname'] = 'localhost';
 $db['thibault']['username'] = 'root';
 $db['thibault']['password'] = 'pastor5456';

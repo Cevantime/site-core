@@ -114,6 +114,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`id`, `login`, `password`, `email`) VALUES
 (1, 'Cevantime', 'e57521ce558d6f58a3d6ea36b4852148', 'thibault.truffert@gmail.com');
+INSERT INTO `users` (`id`, `login`, `password`, `email`) VALUES
+(2, 'Alto', '3b37936dd94036f48b47226b3c2d0adb', 'gwadaldesign@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -134,6 +136,8 @@ CREATE TABLE IF NOT EXISTS `users_admin` (
 
 INSERT INTO `users_admin` (`id`, `name`, `forname`) VALUES
 (1, 'Thibault', 'Truffert');
+INSERT INTO `users_admin` (`id`, `name`, `forname`) VALUES
+(2, 'Alex', 'Taurisano');
 
 --
 -- Contraintes pour les tables exportées
