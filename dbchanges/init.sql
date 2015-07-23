@@ -53,6 +53,8 @@ CREATE TABLE IF NOT EXISTS `links_users_rights` (
 INSERT INTO `links_users_rights` (`user_id`, `right_id`) VALUES
 (1, 1),
 (1, 2);
+INSERT INTO `links_users_rights` (`user_id`, `right_id`) VALUES
+(2, 2);
 
 -- --------------------------------------------------------
 
@@ -106,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `password` varchar(100) NOT NULL,
   `email` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Contenu de la table `users`
