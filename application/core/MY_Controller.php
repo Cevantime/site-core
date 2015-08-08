@@ -17,6 +17,7 @@ class MY_Controller extends CI_Controller {
 			$this->load->model($model);
 			$model = $this->{$model};
 		}
+		
 		$this->load->helper('paginationfront');
 		$offset = ($offset !== null) ? $offset : 10;
 		$dep = ($start !== null) ? $start * $offset : null;

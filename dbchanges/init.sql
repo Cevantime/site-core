@@ -82,19 +82,19 @@ CREATE TABLE IF NOT EXISTS `posts` (
 CREATE TABLE IF NOT EXISTS `rights` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` enum('see','create','edit','access','*') NOT NULL,
-  `type` varchar(150) DEFAULT NULL,
-  `object_id` int(11) DEFAULT NULL,
+  `type` varchar(150) DEFAULT '*',
+  `object_key` varchar(150) DEFAULT '*',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `name_type` (`name`,`type`)
+  UNIQUE KEY `name_type` (`name`,`type`,`object_key`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Contenu de la table `rights`
 --
 
-INSERT INTO `rights` (`id`, `name`, `type`, `object_id`) VALUES
-(1, 'access', 'backoffice', NULL),
-(2, '*', NULL, NULL);
+INSERT INTO `rights` (`id`, `name`, `type`, `object_key`) VALUES
+(1, 'access', 'backoffice', '*'),
+(2, '*', '*', '*');
 
 -- --------------------------------------------------------
 

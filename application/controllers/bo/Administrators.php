@@ -20,7 +20,7 @@ class Administrators extends BO_Controller {
 	}
 	
 	public function all($limit = 0,$offset=10){
-		$this->checkIfUserCan('see','admins');
+		$this->checkIfUserCan('see','admin','*');
 		$this->load->model('admin');
 		$admins = $this->pagination('admin', $limit, $offset);
 		$this->layout->assign('administrators', $admins);

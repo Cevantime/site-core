@@ -35,30 +35,19 @@ class User extends DATA_Model {
 		return $this->getRow(array('login'=>$login,'password'=>$password));
 	}
 
-	public function can($action, $type= NULL, $value = NULL){
+	public function can($action, $type='*', $value='*'){
 		$this->loadRights();
-		if($value){
-			if($this->hasARightTo($action, $type.'s')){
-				return true;
-			}
-			foreach($this->rights as $right){
-				if($right->name === $action && $right->type === $type && $right->value===$value){
-					return true;
-				}
-			}
-			return false;
-		}
-		if($this->hasARightTo($action, $type)){
-			return true;
-		}
-		return false;
+		$rights = $this->rights;
+		return $this->checkInRights($rights, 'name', $action) &&
+		$this->checkInRights($rights, 'type', $type) &&
+		$this->checkInRights($rights, 'object_key', $value);
 		
 	}
 
-	public function hasARightTo($action, $type){
-		$this->loadRights();
-		foreach($this->rights as $right){
-			if($right->name === '*' || ($right->name === $action && $right->type === $type)){
+	public function checkInRights(&$rights, $type, $value) {
+		foreach($rights as $right) {
+			$rightValue = $right->$type;
+			if($rightValue === '*' || $rightValue === $value) {
 				return true;
 			}
 		}
@@ -89,10 +78,10 @@ class User extends DATA_Model {
 		
 	}
 	
-	public function allowUserTo($userId, $action, $type=NULL, $value=NULL) {
+	public function allowUserTo($userId, $action, $type='*', $value='*') {
 		$this->load->model('right');
-		$this->right->save(array('name'=>$action,'type'=>$type,'object_id'=>$value));
-		$right = $this->right->getRow(array('name'=>$action,'type'=>$type,'object_id'=>$value));
+		$this->right->save(array('name'=>$action,'type'=>$type,'object_key'=>$value));
+		$right = $this->right->getRow(array('name'=>$action,'type'=>$type,'object_key'=>$value));
 		return $this->db->insert(Right::$USERS_RIGHTS_LINK_TABLE_NAME, array('user_id'=>$userId,'right_id'=>$right->id));
 	}
 	

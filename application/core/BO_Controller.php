@@ -99,7 +99,7 @@ class BO_Controller extends CI_Controller {
 		$this->addMessage('warning', $message);
 	}
 	
-	protected function checkIfUserCan($action,$object=null,$value=null){
+	protected function checkIfUserCan($action,$object='*',$value='*'){
 		if(!$this->user->can($action,$object,$value)){
 			redirect('bo/home');
 		}
