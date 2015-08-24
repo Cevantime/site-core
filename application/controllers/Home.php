@@ -6,7 +6,8 @@ if (!defined('BASEPATH'))
 class Home extends MY_Controller {
 
 	public function index() {
-		$this->layout->view('home/index');
+		$this->load->spark('example-spark/1.0.0');
+		$this->example_spark->printHello();
 	}
 
 }

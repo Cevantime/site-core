@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php
+
+require_once 'lib/module/module_source.php';
+require_once 'lib/module/module_cli.php';
+
+// define a source
+$sources = array();
+if ($fh = @fopen(dirname(__FILE__) . '/lib/module/sources', 'r'))
+{
+    while ($line = fgets($fh))
+    {
+        $line = trim($line);
+        if ($line && $line[0] != '#') $sources[] = new Module_source($line);
+    }
+    fclose($fh);
+}
+
+if (count($sources) == 0)
+{
+    Spark_utils::warning("No source found, aborting.");
+}
+ else {
+	// take commands
+	$cli = new Module_CLI($sources);
+
+	$cmd = $argc > 1 ? $argv[1] : null;
+	$args = $argc > 2 ? array_slice($argv, 2) : array();
+
+	$cli->execute($cmd, $args);
+ }

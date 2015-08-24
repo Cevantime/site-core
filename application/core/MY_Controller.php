@@ -1,6 +1,6 @@
 <?php
 
-class MY_Controller extends CI_Controller {
+class MY_Controller extends MX_Controller {
 
 	// Site global layout
 	public $layout_view = 'layout/default';

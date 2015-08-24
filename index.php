@@ -281,6 +281,9 @@ switch (ENVIRONMENT)
 	}
 
 	define('VIEWPATH', $view_folder);
+	
+	// add composer autoload
+	include "./vendor/autoload.php";
 
 /*
  * --------------------------------------------------------------------
