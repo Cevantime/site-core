@@ -9,6 +9,8 @@ define('MODULE_VERSION', '0.0.1');
 
 class Module_CLI {
 
+	public $module_sources;
+	
     private static $commands = array(
         'help' => 'help',
         'install' => 'install',
@@ -24,7 +26,7 @@ class Module_CLI {
 
     function __construct($spark_sources)
     {
-        $this->spark_sources = $spark_sources;
+        $this->module_sources = $spark_sources;
     }
 
     function execute($command, $args = array())
@@ -116,14 +118,14 @@ class Module_CLI {
     private function search($args)
     {
         $term = implode($args, ' ');
-        foreach($this->spark_sources as $source)
+        foreach($this->module_sources as $source)
         {
             $results = $source->search($term);
             foreach ($results as $result)
             {
                 $result_line = "\033[33m$result->name\033[0m - $result->summary";
                 // only show the source information if there are multiple sources
-                if (count($this->spark_sources) > 1) $result_line .= " (source: $source->url)";
+                if (count($this->module_sources) > 1) $result_line .= " (source: $source->url)";
                 Module_utils::line($result_line);
             }
         }
@@ -131,7 +133,7 @@ class Module_CLI {
 
     private function sources()
     {
-        foreach($this->spark_sources as $source)
+        foreach($this->module_sources as $source)
         {
             Module_utils::line($source->get_url());
         }
@@ -186,32 +188,70 @@ class Module_CLI {
 
         $module_name = $flats[0];
         $version = array_key_exists('v', $flags) ? $flags['v'] : 'HEAD';
+		
+		if(!$version) {
+			return $this->failtown('you must specify a version flag');
+		}
 
         // retrieve the spark details
-        foreach ($this->spark_sources as $source)
+        foreach ($this->module_sources as $source)
         {
             Module_utils::notice("Retrieving module detail from " . $source->get_url());
-            $spark = $source->get_module($module_name, $version);
-            if ($spark != null) break;
+            $module = $source->get_module($module_name, $version);
+            if ($module != null) break;
         }
 
         // did we find the details?
-        if ($spark == null)
+        if ($module == null)
         {
-            throw new Module_exception("Unable to find spark: $module_name ($version) in any sources");
+            throw new Module_exception("Unable to find module: $module_name ($version) in any sources");
         }
+		
+		// looking for an already installed version
+		$dir_module = MODULE_PATH . "/$module_name" ;
+		if(file_exists($dir_module)){
+			$installed_version = file_get_contents($dir_module.'/module.version');
+			if($installed_version) {
+				$comp = $this->compareVersions($version, $installed_version);
+				if($comp === 0) {
+					Module_utils::notice('The module '.$module_name.' is already installed. No action needed.');
+					return ;
+				} else if ($comp === 1) {
+					Module_utils::warning('The module '.$module_name.' is already installed in a previous version. This old version will be replaced by the new one.');
+					Module_utils::remove_full_directory($dir_module);
+				} else {
+					Module_utils::notice('The module '.$module_name.' is already installed in more recent version. No action needed.');
+				}
+			} else {
+				Module_utils::warning('The module '.$module_name.' is already installed in a undefined version. Thisversion will be replaced by the new one.');
+				Module_utils::remove_full_directory($dir_module);
+			}
+		}
 
         // verify the spark, and put out warnings if needed
-        $spark->verify();
+        $module->verify();
 
         // retrieve the spark
-        Module_utils::notice("From Downtown! Retrieving spark from " . $spark->location_detail());
-        $spark->retrieve();
+        Module_utils::notice("From Downtown! Retrieving module from " . $module->location_detail());
+        $module->retrieve();
 
         // Install it
-        $spark->install();
-        Module_utils::notice('Spark installed to ' . $spark->installed_path() . ' - You\'re on fire!');
+        $module->install();
+        Module_utils::notice('Module installed to ' . $module->installed_path() . ' - You\'re on fire!');
     }
+	
+	private function compareVersions($version1, $version2){
+		$v1_array = explode(',', $version1);
+		$v2_array = explode(',', $version2);
+		for($i = 0; $i<3; $i++){
+			if($v1_array[$i] > $v2_array[$i]){
+				return 1;
+			} else if($v1_array[$i] < $v2_array[$i]) {
+				return -1;
+			}
+		}
+		return 0;
+	}
 
     private function reinstall($args)
     {

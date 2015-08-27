@@ -1,6 +1,6 @@
 <?php
 
-class Git_spark extends Module_type {
+class Git_spark extends Spark_type {
 
     function __construct($data)
     {

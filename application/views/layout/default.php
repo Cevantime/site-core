@@ -19,7 +19,6 @@
     </head>
     <body>
 		<div id="fb-root"></div>
-		
 		<?php $this->load->view('includes/messages'); ?>
 		
         <div id="wrap">

@@ -77,7 +77,7 @@ class Module_utils {
 
     static function notice($msg)
     {
-        self::line($msg, 'SPARK', '[1;36m');
+        self::line($msg, 'MODULE', '[1;36m');
     }
 
     static function error($msg)

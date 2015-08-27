@@ -16,8 +16,13 @@ class Module_source {
         return $this->url;
     }
 	
-	function get_module() {
-		return new Git_module($this->url);
+	function get_module($module_name, $version) {
+		
+		$module = new Git_module($module_name, $version, $this->url);
+		if($module->exists()) return $module;
+		Module_utils::error('ooops. It seems that the module or this version of module doesn\'t exists' );
+		return null;
 	}
 
+	
 }

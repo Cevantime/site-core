@@ -21,9 +21,11 @@ class Layout {
 	private $metas = array();
 	private $css_list = array(), $js_list = array(), $js_script_list = array(), $datas = array();
 	private $block_list, $block_new, $block_replace = false;
+	private $layout_view;
 
 	function Layout() {
 		$this->obj = & get_instance();
+		$this->layout_view = 'default';
 		// Grab layout from called controller
 	}
 
@@ -48,7 +50,7 @@ class Layout {
 			$this->datas['css_for_layout'] .= sprintf('<link rel="stylesheet" type="text/css"  href="%s" />', base_url() . $v);
 		// Render template
 		$this->block_replace = true;
-		$output = $this->obj->load->view($this->obj->layout_view, $this->datas, $return);
+		$output = $this->obj->load->view($this->layout_view, $this->datas, $return);
 		return $output;
 	}
 
@@ -141,7 +143,7 @@ class Layout {
 	 * @param string $layoutName The name of the layout to be set
 	 */
 	public function setLayout($layoutName) {
-		$this->obj->layout_view = 'layout/' . $layoutName;
+		$this->layout_view = 'layout/' . $layoutName;
 	}
 
 	function addSyntaxHighlighting() {

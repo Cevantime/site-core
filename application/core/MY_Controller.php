@@ -3,10 +3,10 @@
 class MY_Controller extends MX_Controller {
 
 	// Site global layout
-	public $layout_view = 'layout/default';
 
 	public function __construct() {
 		parent::__construct();
+		$this->layout->setLayout('default');
 		// Layout library loaded site wide
 		$this->layout->assign('uri_string', $this->uri->uri_string());
 		$this->breadcrumb();

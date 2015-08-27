@@ -11,9 +11,12 @@
  *
  * @author thibault
  */
-class Login extends CI_Controller {
+class Login extends MX_Controller {
 	
-	public $layout_view = 'layout/login_bo';
+	public function __construct() {
+		parent::__construct();
+		$this->layout->setLayout('login_bo');
+	}
 	
 	public function index() {
 		if($this->session->user_id){

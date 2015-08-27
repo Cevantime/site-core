@@ -90,7 +90,7 @@ class Spark_type {
         // Get the spark object
         $spark = null;
         if ($dependency_data->repository_type == 'hg') $spark = Mercurial_spark::get_spark($dependency_data);
-        else if ($dependency_data->repository_type == 'git') $spark = Git_module::get_spark($dependency_data);
+        else if ($dependency_data->repository_type == 'git') $spark = Git_spark::get_spark($dependency_data);
         else if ($dependency_data->repository_type == 'zip') $spark = new Zip_spark($dependency_data);
         else throw new Exception('Unknown repository type: ' . $dependency_data->repository_type);
         // Install the spark

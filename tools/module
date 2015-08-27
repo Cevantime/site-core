@@ -18,7 +18,7 @@ if ($fh = @fopen(dirname(__FILE__) . '/lib/module/sources', 'r'))
 
 if (count($sources) == 0)
 {
-    Spark_utils::warning("No source found, aborting.");
+    Module_utils::warning("No source found, aborting.");
 }
  else {
 	// take commands

@@ -10,14 +10,13 @@
  *
  * @author thibault
  */
-class BO_Controller extends CI_Controller {
-
-	public $layout_view = 'layout/bo';
+class BO_Controller extends MX_Controller {
 	
 	protected $userId;
 
 	public function __construct() {
 		parent::__construct();
+		$this->layout->setLayout('bo');
 		$this->load->model('user');
 		if($this->session->user_id){
 			$this->user->load($this->session->user_id);
