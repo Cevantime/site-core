@@ -109,7 +109,7 @@ class Module_CLI {
         Module_utils::line('remove          # Remove a spark');
 //        Module_utils::line('list            # List installed sparks');
 //        Module_utils::line('search          # Search for a spark');
-//        Module_utils::line('sources         # Display the spark source URL(s)');
+        Module_utils::line('sources         # Display the spark source URL(s)');
 //        Module_utils::line('upgrade-system  # Update Sparks Manager to latest version (does not upgrade any of your installed sparks)');
         Module_utils::line('version         # Display the installed spark version');
         Module_utils::line('help            # Print This message');

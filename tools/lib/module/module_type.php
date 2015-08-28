@@ -42,7 +42,28 @@ class Module_type {
         @mkdir(MODULE_PATH . "/$this->name");
         Module_utils::full_move($this->temp_path, $this->installation_path);
 		file_put_contents($this->installation_path.'/module.version', $this->version);
-        Module_utils::remove_full_directory($this->temp_path);
+		if(file_exists($this->installation_path.'/dbchanges')){
+			$dbchanges_path = MODULE_PATH.'/../../dbchanges';
+			@mkdir($dbchanges_path);
+			$dbchanges_modules = $dbchanges_path.'/modules';
+			@mkdir($dbchanges_modules);
+			Module_utils::full_move($this->installation_path.'/dbchanges', $dbchanges_modules.'/'.$this->name);
+		}
+		if(file_exists($this->installation_path.'/core')) {
+			$core_path = MODULE_PATH.'/../core';
+			Module_utils::full_move($this->installation_path.'/core', $core_path);
+			Module_utils::remove_full_directory($this->installation_path.'/core');
+		}
+		if(file_exists($this->installation_path.'/js')) {
+			$js_path = MODULE_PATH.'/../../js';
+			Module_utils::full_move($this->installation_path.'/js', $js_path);
+			Module_utils::remove_full_directory($this->installation_path.'/js');
+		}
+		if(file_exists($this->installation_path.'/css')) {
+			$js_path = MODULE_PATH.'/../../css';
+			Module_utils::full_move($this->installation_path.'/css', $js_path);
+			Module_utils::remove_full_directory($this->installation_path.'/css');
+		}
         $this->installed_path = $this->installation_path;
     }
 	

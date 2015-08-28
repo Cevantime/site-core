@@ -10,7 +10,7 @@ class Home extends MY_Controller {
 	}
 
 	public function index() {
-		$this->layout->view('index');
+		$this->load->view('index');
 	}
 
 }
