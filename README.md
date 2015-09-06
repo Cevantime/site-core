@@ -20,12 +20,12 @@ As you may know, Composer is a very powerful and popular tool to help you gettin
 creating or sharing php packages in a clean and efficient way. In the site-core, 
 you can use composer to install packages it as follows :
 
-    php tools/composer install
+    php tools/composer --working-dir=application/ install
 
 > **Note:**
 
 > Of course, this require you defined all your Composer dependencies in the composer.json 
-file that located at the root of your project. See [composer documentation][12] for details.
+file that located in the application folder. See [composer documentation][12] for details.
 
 Spark
 -------
