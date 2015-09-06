@@ -33,7 +33,8 @@ Spark
 Spark in an other tool which is aimed to provide a simple but robust way to share 
 Code Igniter piece of code, named sparks. Although it has been a bit outdated by composer, 
 it has the advantage of having been designed for CI and thus it works just fine with 
-this framework and is very easy to use. Moreover, it still contains very handy piece of code indeed. To install the version X.X.X of a spark, just tape the following in the prompt :
+this framework and is very easy to use. Moreover, it still contains very handy piece 
+of code indeed. To install the version X.X.X of a spark, just tape the following in the prompt :
 
     php tools/spark install -vX.X.X [myspark]
 

@@ -71,11 +71,11 @@ class Module_type {
 		$module = $dependency['name'];
 		$version = $dependency['version'];
 		Module_utils::line('installing composer dependency : '.$module);
-		$composer_json = json_decode(file_get_contents(MODULE_PATH.'/../../composer.json'), true);
+		$composer_json = json_decode(file_get_contents(MODULE_PATH.'/../composer.json'), true);
 		$composer_json['require'][$module] = $version;
-		file_put_contents(MODULE_PATH.'/../../composer.json', json_encode($composer_json));
+		file_put_contents(MODULE_PATH.'/../composer.json', json_encode($composer_json, JSON_PRETTY_PRINT));
 		
-		`php tools/composer install`;
+		`php tools/composer --working-dir=application/ install`;
 	}
 	private function install_spark_dependency($dependency) {
 		$spark = $dependency['name'];

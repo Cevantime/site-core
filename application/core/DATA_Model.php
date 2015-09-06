@@ -166,7 +166,7 @@ abstract class DATA_Model extends CI_Model {
 		if ($columns === null && !$this->getData('columns')) {
 			$columns = $this->getDataColumns();
 		} else if ($columns === null) {
-			$columns = $this->columns;
+			$columns = $this->getData('columns');
 		}
 
 		if ($search === null) {
@@ -223,7 +223,6 @@ abstract class DATA_Model extends CI_Model {
 	 * @param array $where the where sql clause in an array form
 	 */
 	public function loadRow($where) {
-		$this->makeExtendedJoins();
 		$rows = $this->get($where, 'array');
 		if (count($rows) == 1) {
 			$this->setDatas($rows[0]);
