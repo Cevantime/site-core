@@ -75,7 +75,7 @@ class Module_type {
 		$composer_json['require'][$module] = $version;
 		file_put_contents(MODULE_PATH.'/../composer.json', json_encode($composer_json, JSON_PRETTY_PRINT));
 		
-		`php tools/composer --working-dir=application/ install`;
+		`php tools/composer --working-dir=application/ update`;
 	}
 	private function install_spark_dependency($dependency) {
 		$spark = $dependency['name'];
