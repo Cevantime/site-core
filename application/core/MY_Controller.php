@@ -6,6 +6,7 @@ class MY_Controller extends MX_Controller {
 
 	public function __construct() {
 		parent::__construct();
+		$this->load->library('layout/layout');
 		$this->layout->setLayout('default');
 		// Layout library loaded site wide
 		$this->layout->assign('uri_string', $this->uri->uri_string());
