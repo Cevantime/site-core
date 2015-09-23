@@ -42,13 +42,17 @@ class Module_type {
         @mkdir(MODULE_PATH . "/$this->name");
         Module_utils::full_move($this->temp_path, $this->installation_path);
 		file_put_contents($this->installation_path.'/module.version', $this->version);
-		if(file_exists($this->installation_path.'/dbchanges')){
-			$dbchanges_path = MODULE_PATH.'/../../dbchanges';
-			@mkdir($dbchanges_path);
-			$dbchanges_modules = $dbchanges_path.'/modules';
-			@mkdir($dbchanges_modules);
-			Module_utils::full_move($this->installation_path.'/dbchanges', $dbchanges_modules.'/'.$this->name);
-		}
+		
+		if(file_exists($this->installation_path.'/dbchanges.sql')){
+			$changeLogPath = $this->installation_path.'/dbchanges.sql';
+			$changeLogContent = file_get_contents($changeLogPath);
+			$changeLogTargetPath = $dbchanges_path = MODULE_PATH.'/../../dbchanges/liquibase/changeLog.sql';
+			$changeLogTargetContent = file_get_contents($changeLogTargetPath);
+			$changeToAppend = "$changeLogTargetContent\n\n--changeset module:install_module_$this->name\n\n$changeLogContent";
+			file_put_contents($changeLogTargetPath, $changeToAppend);
+			
+			`php dbchanges/liquibase/update.php`;
+			unlink($changeLogPath);		}
 		if(file_exists($this->installation_path.'/core')) {
 			$core_path = MODULE_PATH.'/../core';
 			Module_utils::full_move($this->installation_path.'/core', $core_path);

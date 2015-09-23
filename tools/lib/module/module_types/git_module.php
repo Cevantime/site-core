@@ -1,4 +1,4 @@
-<?php
+cd <?php
 
 class Git_module extends Module_type {
 
