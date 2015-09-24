@@ -43,16 +43,27 @@ class Module_type {
         Module_utils::full_move($this->temp_path, $this->installation_path);
 		file_put_contents($this->installation_path.'/module.version', $this->version);
 		
-		if(file_exists($this->installation_path.'/dbchanges.sql')){
-			$changeLogPath = $this->installation_path.'/dbchanges.sql';
-			$changeLogContent = file_get_contents($changeLogPath);
+		if(file_exists($this->installation_path.'/dbchanges')){
+			$dbchangesPath = $this->installation_path.'/dbchanges';
+			$changeToAppend = '';
+			$files = scandir($dbchangesPath);
+			foreach($files as $file){
+				if($file === '..' || $file === '.' || is_dir($dbchangesPath.'/'.$file)){
+					continue;
+				}
+				$filename = basename($file,'.sql');
+				$prefix = "--changeset module:install_{$this->name}_$filename\n";
+				$suffix = "\n";
+				$changeToAppend .= $prefix.file_get_contents($dbchangesPath.'/'.$file).$suffix;
+			}
 			$changeLogTargetPath = $dbchanges_path = MODULE_PATH.'/../../dbchanges/liquibase/changeLog.sql';
 			$changeLogTargetContent = file_get_contents($changeLogTargetPath);
-			$changeToAppend = "$changeLogTargetContent\n\n--changeset module:install_module_$this->name\n\n$changeLogContent";
+			$changeToAppend = $changeLogTargetContent . $changeToAppend;
 			file_put_contents($changeLogTargetPath, $changeToAppend);
 			
 			`php dbchanges/liquibase/update.php`;
-			unlink($changeLogPath);		}
+			Module_utils::remove_full_directory($dbchangesPath);	
+		}
 		if(file_exists($this->installation_path.'/core')) {
 			$core_path = MODULE_PATH.'/../core';
 			Module_utils::full_move($this->installation_path.'/core', $core_path);
@@ -108,7 +119,7 @@ class Module_type {
         {
             if ($break_on_already_installed)
             {
-                throw new Module_exception("Already installed.  Try `php tools/spark reinstall $this->name`");
+                throw new Module_exception("Already installed.  Try `php tools/module reinstall $this->name`");
             }
             return false;
         }
