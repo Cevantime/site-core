@@ -84,7 +84,7 @@ class Git_module extends Module_type {
         }
 //        `cd $this->temp_path; git remote add -f origin $this->base_location; git config core.sparseCheckout true; echo "$this->name/$this->version" >> .git/info/sparse-checkout; git pull origin master`;
 
-        $cmd .= "cd $this->temp_path & git remote add -f origin $this->base_location & git config core.sparseCheckout true & echo $this->name/$this->version >> .git/info/sparse-checkout & git pull origin master";
+        $cmd .= "cd $this->temp_path & git remote add -f origin $this->base_location & git config core.sparseCheckout true & (echo $this->name/$this->version)>>.git/info/sparse-checkout & git pull origin master";
         Module_utils::line("executing $cmd");
         exec($cmd);
         return file_exists("$this->temp_path/$this->name/$this->version");
