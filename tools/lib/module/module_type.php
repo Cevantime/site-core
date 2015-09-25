@@ -42,12 +42,27 @@ class Module_type {
         @mkdir(MODULE_PATH . "/$this->name");
         Module_utils::full_move($this->temp_path, $this->installation_path);
 		file_put_contents($this->installation_path.'/module.version', $this->version);
+		
 		if(file_exists($this->installation_path.'/dbchanges')){
-			$dbchanges_path = MODULE_PATH.'/../../dbchanges';
-			@mkdir($dbchanges_path);
-			$dbchanges_modules = $dbchanges_path.'/modules';
-			@mkdir($dbchanges_modules);
-			Module_utils::full_move($this->installation_path.'/dbchanges', $dbchanges_modules.'/'.$this->name);
+			$dbchangesPath = $this->installation_path.'/dbchanges';
+			$changeToAppend = '';
+			$files = scandir($dbchangesPath);
+			foreach($files as $file){
+				if($file === '..' || $file === '.' || is_dir($dbchangesPath.'/'.$file)){
+					continue;
+				}
+				$filename = basename($file,'.sql');
+				$prefix = "--changeset module:install_{$this->name}_$filename\n";
+				$suffix = "\n";
+				$changeToAppend .= $prefix.file_get_contents($dbchangesPath.'/'.$file).$suffix;
+			}
+			$changeLogTargetPath = $dbchanges_path = MODULE_PATH.'/../../dbchanges/liquibase/changeLog.sql';
+			$changeLogTargetContent = file_get_contents($changeLogTargetPath);
+			$changeToAppend = $changeLogTargetContent . $changeToAppend;
+			file_put_contents($changeLogTargetPath, $changeToAppend);
+			
+			`php dbchanges/liquibase/update.php`;
+			Module_utils::remove_full_directory($dbchangesPath);	
 		}
 		if(file_exists($this->installation_path.'/core')) {
 			$core_path = MODULE_PATH.'/../core';
@@ -75,7 +90,7 @@ class Module_type {
 		$composer_json['require'][$module] = $version;
 		file_put_contents(MODULE_PATH.'/../composer.json', json_encode($composer_json, JSON_PRETTY_PRINT));
 		
-		`php tools/composer --working-dir=application/ install`;
+		`php tools/composer --working-dir=application/ update`;
 	}
 	private function install_spark_dependency($dependency) {
 		$spark = $dependency['name'];
@@ -104,7 +119,7 @@ class Module_type {
         {
             if ($break_on_already_installed)
             {
-                throw new Module_exception("Already installed.  Try `php tools/spark reinstall $this->name`");
+                throw new Module_exception("Already installed.  Try `php tools/module reinstall $this->name`");
             }
             return false;
         }

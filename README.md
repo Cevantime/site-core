@@ -24,7 +24,7 @@ you can use composer to install packages it as follows :
 
 > **Note:**
 
-> Of course, this require you defined all your Composer dependencies in the composer.json 
+> Of course, this requires you defined all your Composer dependencies in the composer.json 
 file that located in the application folder. See [composer documentation][12] for details.
 
 Spark
