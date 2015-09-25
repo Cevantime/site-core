@@ -104,5 +104,15 @@ class Module_utils {
             }
         }
     }
+	
+	static function is_os($osname){
+		$osname = strtolower($osname);
+		$uname = php_uname('s');
+		$os_len = strlen($osname);
+		if(substr(strtolower($uname), 0,$os_len) === $osname){
+			return true;
+		}
+		return false;
+	}
 
 }

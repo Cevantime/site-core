@@ -78,13 +78,15 @@ class Git_module extends Module_type {
 
         Module_utils::line('testing module existency');
         $cmd = '';
+		Module_utils::line('os detected : '.(Module_utils::is_os('linux') ? 'linux' : 'windaube'));
+		$sep = Module_utils::is_os('linux') ? ';' : '&';
         if (!file_exists($this->temp_path)) {
-            $cmd .= "git init $this->temp_path & ";
+            $cmd .= "git init $this->temp_path $sep ";
 //            `git init $this->temp_path`;
         }
 //        `cd $this->temp_path; git remote add -f origin $this->base_location; git config core.sparseCheckout true; echo "$this->name/$this->version" >> .git/info/sparse-checkout; git pull origin master`;
 
-        $cmd .= "cd $this->temp_path & git remote add -f origin $this->base_location & git config core.sparseCheckout true & (echo $this->name/$this->version)>>.git/info/sparse-checkout & git pull origin master";
+        $cmd .= "cd $this->temp_path $sep git remote add -f origin $this->base_location $sep git config core.sparseCheckout true $sep (echo $this->name/$this->version)>>.git/info/sparse-checkout $sep git pull origin master";
         Module_utils::line("executing $cmd");
         exec($cmd);
         return file_exists("$this->temp_path/$this->name/$this->version");
