@@ -56,12 +56,6 @@ class Git_module extends Module_type {
         if (!file_exists("$this->temp_path/$this->name/$this->version")) {
             throw new Module_exception('Ooops. It seems that the module or this version of the module doesn\'t exists');
         }
-        if (file_exists("$this->temp_path/$this->name/$this->version/dependencies.json")) {
-            $this->dependencies = @json_decode(@file_get_contents("$this->temp_path/$this->name/$this->version/dependencies.json"), true);
-            unlink("$this->temp_path/$this->name/$this->version/dependencies.json");
-        } else {
-            $this->dependencies = array();
-        }
 
         Module_utils::full_move("$this->temp_path/$this->name/$this->version", "$this->temp_path");
 

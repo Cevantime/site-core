@@ -27,8 +27,17 @@ class Module_type {
 
     function install()
     {
-        $dependencies = $this->dependencies;
-		
+		$module = array();
+		if(file_exists("$this->temp_path/module.json")) {
+			$module = @json_decode(@file_get_contents("$this->temp_path/module.json"), true);
+			$dependencies = isset($module['dependencies']) && is_array($module['dependencies']) ? $module['dependencies'] : array();
+		}
+        else if (file_exists("$this->temp_path/dependencies.json")) {
+            $dependencies = @json_decode(@file_get_contents("$this->temp_path/dependencies.json"), true);
+        } else {
+            $dependencies = array();
+        }
+		if (file_exists("$this->temp_path/dependencies.json")) unlink("$this->temp_path/dependencies.json");
 		foreach(array('composer', 'spark', 'module') as $type){
 			if(isset($dependencies[$type])&& is_array($dependencies[$type])) {
 				foreach ($dependencies[$type] as $dependency) {
@@ -37,7 +46,9 @@ class Module_type {
 				}
 			}
 		}
-
+		$module['dependencies'] = $dependencies;
+		$map = array();
+		$module['map'] = $map;
         @mkdir(MODULE_PATH); // Two steps for windows
         @mkdir(MODULE_PATH . "/$this->name");
         Module_utils::full_move($this->temp_path, $this->installation_path);
@@ -46,11 +57,9 @@ class Module_type {
 		if(file_exists($this->installation_path.'/dbchanges')){
 			$dbchangesPath = $this->installation_path.'/dbchanges';
 			$changeToAppend = '';
-			$files = scandir($dbchangesPath);
+			$files = Module_utils::list_files($dbchangesPath);
 			foreach($files as $file){
-				if($file === '..' || $file === '.' || is_dir($dbchangesPath.'/'.$file)){
-					continue;
-				}
+				$module['map']['dbchanges'][] = $file;
 				$filename = basename($file,'.sql');
 				$prefix = "--changeset module:install_{$this->name}_$filename\n";
 				$suffix = "\n";
@@ -65,22 +74,43 @@ class Module_type {
 			Module_utils::remove_full_directory($dbchangesPath);	
 		}
 		if(file_exists($this->installation_path.'/core')) {
+			$files = Module_utils::list_files($this->installation_path.'/core');
+			foreach ($files as $file){
+				$module['map']['core'][] = $file;
+			}
 			$core_path = MODULE_PATH.'/../core';
 			Module_utils::full_move($this->installation_path.'/core', $core_path);
 			Module_utils::remove_full_directory($this->installation_path.'/core');
 		}
 		if(file_exists($this->installation_path.'/js')) {
+			$this->put_in_module_map($this->installation_path.'/js', $module['map']);
 			$js_path = MODULE_PATH.'/../../js';
 			Module_utils::full_move($this->installation_path.'/js', $js_path);
 			Module_utils::remove_full_directory($this->installation_path.'/js');
 		}
 		if(file_exists($this->installation_path.'/css')) {
-			$js_path = MODULE_PATH.'/../../css';
-			Module_utils::full_move($this->installation_path.'/css', $js_path);
+			$this->put_in_module_map($this->installation_path.'/csss', $module['map']);
+			$css_path = MODULE_PATH.'/../../css';
+			Module_utils::full_move($this->installation_path.'/css', $css_path);
 			Module_utils::remove_full_directory($this->installation_path.'/css');
 		}
+		file_put_contents($this->installation_path.'/module.json', json_encode($module,JSON_PRETTY_PRINT));
         $this->installed_path = $this->installation_path;
     }
+	
+	private function put_in_module_map($filename, &$module_map){
+		$basename = basename($filename);
+		if($basename === '.' || $basename === '..') return;
+		if(is_dir($filename)){
+			$module_map[$basename] = array();
+			$files = scandir($filename);
+			foreach($files as $file){
+				$this->put_in_module_map($filename.'/'.$file, $module_map[$basename]);
+			}
+		} else {
+			$module_map[] = $basename;
+		}
+	}
 	
 	private function install_composer_dependency($dependency) {
 		$module = $dependency['name'];

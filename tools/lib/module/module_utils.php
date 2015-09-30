@@ -114,5 +114,17 @@ class Module_utils {
 		}
 		return false;
 	}
+	
+	static function list_files($dir){
+		$scan = scandir($dir);
+		$files = array();
+		foreach($scan as $file){
+			if($file === '..' || $file === '.' || is_dir($dir.'/'.$file)){
+				continue;
+			}
+			$files[] = $file;
+		}
+		return $files;
+	}
 
 }
