@@ -53,7 +53,7 @@ class Module_type {
         @mkdir(MODULE_PATH . "/$this->name");
         Module_utils::full_move($this->temp_path, $this->installation_path);
 		file_put_contents($this->installation_path.'/module.version', $this->version);
-		
+		Module_utils::remove_full_directory($this->installation_path.'/.git');
 		if(file_exists($this->installation_path.'/dbchanges')){
 			$dbchangesPath = $this->installation_path.'/dbchanges';
 			$changeToAppend = '';
