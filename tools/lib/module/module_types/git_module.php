@@ -60,6 +60,7 @@ class Git_module extends Module_type {
         Module_utils::full_move("$this->temp_path/$this->name/$this->version", "$this->temp_path");
 
         Module_utils::remove_full_directory("$this->temp_path/$this->name");
+        Module_utils::remove_full_directory("$this->temp_path/.git");
 
         if (!file_exists($this->temp_path)) {
             throw new Module_exception('Failed to retrieve the module ;(');

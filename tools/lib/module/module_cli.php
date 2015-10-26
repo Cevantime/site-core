@@ -260,7 +260,7 @@ class Module_CLI {
 
         if (count($flats) != 1)
         {
-            return $this->failtown('format: `spark reinstall -v1.0.0 name`');
+            return $this->failtown('format: `module reinstall -v1.0.0 name`');
         }
 
         $spark_name = $flats[0];
