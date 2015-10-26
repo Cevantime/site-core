@@ -52,7 +52,11 @@ class Module_type {
         @mkdir(MODULE_PATH); // Two steps for windows
         @mkdir(MODULE_PATH . "/$this->name");
         Module_utils::full_move($this->temp_path, $this->installation_path);
-		file_put_contents($this->installation_path.'/module.version', $this->version);
+		
+		if(file_exists($this->installation_path.'/prebuild.php')) {
+			`php $this->installation_path/prebuild.php`;
+			unlink($this->installation_path.'/prebuild.php');
+		}
 		
 		if(file_exists($this->installation_path.'/dbchanges')){
 			$dbchangesPath = $this->installation_path.'/dbchanges';
@@ -89,13 +93,18 @@ class Module_type {
 			Module_utils::remove_full_directory($this->installation_path.'/js');
 		}
 		if(file_exists($this->installation_path.'/css')) {
-			$this->put_in_module_map($this->installation_path.'/csss', $module['map']);
+			$this->put_in_module_map($this->installation_path.'/css', $module['map']);
 			$css_path = MODULE_PATH.'/../../css';
 			Module_utils::full_move($this->installation_path.'/css', $css_path);
 			Module_utils::remove_full_directory($this->installation_path.'/css');
 		}
+		$module['version'] = $this->version;
 		file_put_contents($this->installation_path.'/module.json', json_encode($module,JSON_PRETTY_PRINT));
         $this->installed_path = $this->installation_path;
+		if(file_exists($this->installation_path.'/postbuild.php')) {
+			`php $this->installation_path/postbuild.php`;
+			unlink($this->installation_path.'/postbuild.php');
+		}
     }
 	
 	private function put_in_module_map($filename, &$module_map){
