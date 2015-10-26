@@ -62,15 +62,18 @@ class Module_type {
 			$dbchangesPath = $this->installation_path.'/dbchanges';
 			$changeToAppend = '';
 			$files = Module_utils::list_files($dbchangesPath);
+			$changeLogTargetPath = $dbchanges_path = MODULE_PATH.'/../../dbchanges/liquibase/changeLog.sql';
+			$changeLogTargetContent = file_get_contents($changeLogTargetPath);
 			foreach($files as $file){
 				$module['map']['dbchanges'][] = $file;
 				$filename = basename($file,'.sql');
 				$prefix = "--changeset module:install_{$this->name}_$filename\n";
+				if(strpos($changeLogTargetContent, $prefix) !== 0){
+					continue;
+				}
 				$suffix = "\n";
 				$changeToAppend .= $prefix.file_get_contents($dbchangesPath.'/'.$file).$suffix;
 			}
-			$changeLogTargetPath = $dbchanges_path = MODULE_PATH.'/../../dbchanges/liquibase/changeLog.sql';
-			$changeLogTargetContent = file_get_contents($changeLogTargetPath);
 			$changeToAppend = $changeLogTargetContent . $changeToAppend;
 			file_put_contents($changeLogTargetPath, $changeToAppend);
 			
