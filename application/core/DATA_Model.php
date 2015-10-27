@@ -18,6 +18,7 @@ abstract class DATA_Model extends CI_Model {
 	protected $_modelName;
 	protected $_extendedTables;
 	protected $_extendedClasses;
+	protected $_extendedInstances;
 
 	protected function getModelName() {
 		if(!$this->_modelName){
@@ -75,6 +76,17 @@ abstract class DATA_Model extends CI_Model {
 		return $this->_extendedClasses;
 	}
 	
+	public function getBaseClass() {
+		return $this->getExtendedClasses()[0];
+	}
+	
+	protected function loadExtendedInstance($model) {
+		if(!isset($this->$model)){
+			$classname = ucfirst($model);
+			$this->$model = new $classname();
+		}
+	}
+	
 	/**
 	 * if table name is users_admin_root, extended tables will be :
 	 * [users, users_admin, user_admin_root]
@@ -86,7 +98,7 @@ abstract class DATA_Model extends CI_Model {
 			$extendedClasses = $this->getExtendedClasses();
 			foreach ($extendedClasses as $extendedClass) {
 				$model = strtolower($extendedClass);
-				$this->load->model($model);
+				$this->loadExtendedInstance($model);
 				$this->_extendedTables[] = $this->$model->getTableName();
 			}
 		}
@@ -134,7 +146,7 @@ abstract class DATA_Model extends CI_Model {
 		$extendingTables = $this->getExtendedTables();
 		$baseTable = $extendingTables[0];
 		$baseModel = $this->getBaseModelName();
-		$this->load->model($baseModel);
+		$this->loadExtendedInstance($baseModel);
 		$primaryColumns = $this->$baseModel->getPrimaryColumns();
 		if(count($primaryColumns)>1) {
 			//multi primary column link
@@ -260,6 +272,7 @@ abstract class DATA_Model extends CI_Model {
 		if ($where !== null) {
 			$this->db->where($where);
 		}
+		
 		$query = $this->db->get();
 		if ($query->num_rows()) {
 			return $query->result($type);
@@ -340,7 +353,7 @@ abstract class DATA_Model extends CI_Model {
 		}
 		$this->convertArrayColumnsToJson($datas);
 		$baseModel = $this->getBaseModelName();
-		$this->load->model($baseModel);
+		$this->loadExtendedInstance($baseModel);
 		$specificSchema = $this->$baseModel->getSchema(false);
 		$datasToInsert = array();
 		foreach($specificSchema as $col){
@@ -362,7 +375,7 @@ abstract class DATA_Model extends CI_Model {
 		for($i=1; $i<count($extendedTables); $i++){
 			$table = $extendedTables[$i];
 			$model = strtolower($extendedClasses[$i]);
-			$this->load->model($model);
+			$this->loadExtendedInstance($model);
 			$specificSchema = $this->$model->getSchema(false);
 			$datasToInsert = array();
 			foreach($specificSchema as $col){
@@ -393,7 +406,7 @@ abstract class DATA_Model extends CI_Model {
 		if($this->isExtendingModel() && count($primaries)==1) {
 			$baseModel = $this->getBaseModelName();
 			$baseTable = $this->getBaseTableName();
-			$this->load->model($baseModel);
+			$this->loadExtendedInstance($baseModel);
 			$cols = $this->$baseModel->getSchema();
 			$datasToUpdate = array();
 			foreach ($cols as $col) {
@@ -526,7 +539,7 @@ abstract class DATA_Model extends CI_Model {
 			}
 			$lastInsertedId = null;
 			foreach($models as $model){
-				$this->load->model($model);
+				$this->loadExtendedInstance($model);
 				$schema = $this->$model->getSchema(false);
 				$subGroup = array();
 				foreach ($group as $datas) {
@@ -549,7 +562,7 @@ abstract class DATA_Model extends CI_Model {
 				$keys[] = $this->getPrimaryColumns()[0];
 			}
 			
-			$this->load->model($model);
+			$this->loadExtendedInstance($model);
 			$values = array();
 			foreach ($subGroup as $datas) {
 				foreach ($datas as $key => $data){
@@ -575,7 +588,7 @@ abstract class DATA_Model extends CI_Model {
 				$models[] = strtolower($concernedClasses[$i]);
 			}
 			foreach($models as $model){
-				$this->load->model($model);
+				$this->loadExtendedInstance($model);
 				$schema = $this->$model->getSchema(false);
 				$subGroup = array();
 				foreach ($group as $datas) {
@@ -602,14 +615,18 @@ abstract class DATA_Model extends CI_Model {
 				}
 				$values[] = implode(',', $datas);
 			}
-			$this->load->model($model);
+			$this->loadExtendedInstance($model);
 			$dataColumns = array_diff($keys, $this->$model->getPrimaryColumns());
-			$on_duplicate_col = array();
-			foreach ($dataColumns as $dataColumn) {
-				$on_duplicate_col[] = '`' . $dataColumn . '`=VALUES(`' . $dataColumn . '`)';
+			if(!$dataColumns){
+				$sql = 'INSERT IGNORE INTO ' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ')';
+			} else {
+				$on_duplicate_col = array();
+				foreach ($dataColumns as $dataColumn) {
+					$on_duplicate_col[] = '`' . $dataColumn . '`=VALUES(`' . $dataColumn . '`)';
+				}
+				$sql = 'INSERT INTO ' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ')'
+						. ' ON DUPLICATE KEY UPDATE ' . implode(',', $on_duplicate_col) . ';';
 			}
-			$sql = 'INSERT INTO ' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ')'
-					. ' ON DUPLICATE KEY UPDATE ' . implode(',', $on_duplicate_col) . ';';
 
 			return $this->db->query($sql);
 		
