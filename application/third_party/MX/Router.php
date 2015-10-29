@@ -167,9 +167,9 @@ class MX_Router extends CI_Router
 				}
 			}
 		}
-
-		if( ! empty($this->directory)) return;
-
+		
+		if( ! empty($this->directory) && $this->located !== -1) return;
+		$this->located = 0;
 		/* application sub-directory controller exists? */
 		if($directory)
 		{

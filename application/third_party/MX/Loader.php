@@ -328,7 +328,6 @@ class MX_Loader extends CI_Loader
 	public function view($view, $vars = array(), $return = FALSE)
 	{
 		list($path, $_view) = Modules::find($view, $this->_module, 'views/');
-		
 		if ($path != FALSE)
 		{
 			$this->_ci_view_paths = array($path => TRUE) + $this->_ci_view_paths;

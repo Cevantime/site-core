@@ -197,6 +197,14 @@ class Modules
 		{
 			$modules[array_shift($segments)] = ltrim(implode('/', $segments).'/','/');
 		}	
+		$fullpath = APPPATH.$base.$path;
+		if ($base == 'libraries/' OR $base == 'models/')
+		{
+			if(is_file($fullpath.ucfirst($file_ext))) return array($fullpath, ucfirst($file));
+		}
+		else
+		/* load non-class files */
+		if (is_file($fullpath.$file_ext)) return array($fullpath, $file);
 		
 		foreach (Modules::$locations as $location => $offset) 
 		{					
