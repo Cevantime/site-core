@@ -19,6 +19,7 @@ abstract class DATA_Model extends CI_Model {
 	protected $_extendedTables;
 	protected $_extendedClasses;
 	protected $_extendedInstances;
+	protected $_joins;
 
 	protected function getModelName() {
 		if(!$this->_modelName){
@@ -158,6 +159,9 @@ abstract class DATA_Model extends CI_Model {
 		for($i = 1; $i < count($extendingTables) - 1; $i++){
 			$table = $extendingTables[$i];
 			$this->db->join($table, $table.'.'.$key.' = '.$this->getTableName().'.'.$key, 'left');
+		}
+		foreach($this->_joins as $join){
+			$this->db->join($join['table'],$join['cond'],$join['type'],$join['espace']);
 		}
 	}
 	
@@ -321,6 +325,10 @@ abstract class DATA_Model extends CI_Model {
 
 	public function deleteId($id) {
 		return $this->delete(array($this->getBaseTableName().'.id' => $id));
+	}
+	
+	public function join($table, $cond, $type = '',$escape='') {
+		$this->_joins[] = array('table'=>$table, 'cond'=>$cond, 'type'=>$type, 'escape',$escape);
 	}
 
 	public function clear() {
