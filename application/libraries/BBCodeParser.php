@@ -17,7 +17,7 @@ class BBCodeParser extends JBBCode\Parser {
 	public function __construct() {
 		parent::__construct();
 		$this->addCodeDefinitionSet(new JBBCode\DefaultCodeDefinitionSet());
-
+		
 		$builder = new JBBCode\CodeDefinitionBuilder('sectioncode', '<pre class="brush: {option}; toolbar: false; first-line: 1; class-name: \'my_personnal_code\'">{param}</pre>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
