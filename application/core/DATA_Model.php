@@ -160,9 +160,12 @@ abstract class DATA_Model extends CI_Model {
 			$table = $extendingTables[$i];
 			$this->db->join($table, $table.'.'.$key.' = '.$this->getTableName().'.'.$key, 'left');
 		}
-		foreach($this->_joins as $join){
-			$this->db->join($join['table'],$join['cond'],$join['type'],$join['espace']);
+		if($this->_joins){
+			foreach($this->_joins as $join){
+				$this->db->join($join['table'],$join['cond'],$join['type'],$join['escape']);
+			}
 		}
+		$this->_joins = array();
 	}
 	
 	protected function isExtendingModel() {
@@ -328,7 +331,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 	
 	public function join($table, $cond, $type = '',$escape='') {
-		$this->_joins[] = array('table'=>$table, 'cond'=>$cond, 'type'=>$type, 'escape',$escape);
+		$this->_joins[] = array('table'=>$table, 'cond'=>$cond, 'type'=>$type, 'escape'=>$escape);
 	}
 
 	public function clear() {
@@ -512,19 +515,19 @@ abstract class DATA_Model extends CI_Model {
 		return false;
 	}
 
-	public function getList($limit = null, $offset = null, $type = 'object') {
+	public function getList($limit = null, $offset = null, $type = 'object', $columns = null) {
 		if ($limit !== null) {
 			$this->db->limit($offset, $limit);
 		}
-		return $this->get(null, $type);
+		return $this->get(null, $type,$columns);
 	}
 
-	public function getListOrderBy($order, $limit = null, $offset = null, $type = 'object') {
+	public function getListOrderBy($order, $limit = null, $offset = null, $type = 'object', $columns = null) {
 		$this->db->order_by($order);
 		if ($limit !== null) {
 			$this->db->limit($offset, $limit);
 		}
-		return $this->get(null,$type);
+		return $this->get(null,$type,$columns);
 	}
 
 	public function count($where = null) {
