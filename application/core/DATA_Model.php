@@ -315,7 +315,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function getId($id, $type = 'object', $columns = null) {
-		return $this->getRow(array($this->getTableName().'.id' => $id));
+		return $this->getRow(array($this->getTableName().'.id' => $id),$type,$columns);
 	}
 
 	public function getAlias($alias, $type = 'object', $columns = null) {
