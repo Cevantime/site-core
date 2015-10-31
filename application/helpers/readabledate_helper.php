@@ -1,11 +1,10 @@
 <?php 
 if (!function_exists('zero_date')) {
 
-	function zero_date($datetime) {
+	function zero_date($time) {
 		$now = time();
-		$dateTimestamp = strtotime($datetime);
-		$diff = $now - $dateTimestamp;
-		$dayOfWeek = day_of_week($dateTimestamp);
+		$diff = $now - $time;
+		$dayOfWeek = day_of_week($time);
 		if ($diff < 180) {
 			return 'il y a moins de 2 minutes';
 		}
@@ -17,20 +16,20 @@ if (!function_exists('zero_date')) {
 			if ($dayOfWeek != day_of_week($now)) {
 				$day = 'hier';
 			}
-			return $day . ' à ' . format_datetime('H\hi', $datetime);
+			return $day . ' à ' . date('H\hi', $time);
 		}
 		if ($diff < 172800) { // moins de deux jours
 			$day = 'hier';
-			if (abs(date('w', $dateTimestamp) - date('w', $now)) == 2) {
+			if (abs(date('w', $time) - date('w', $now)) == 2) {
 				$day = 'avant-hier';
 			}
-			return $day . ' à ' . format_datetime('H\hi', $datetime);
+			return $day . ' à ' . date('H\hi', $time);
 		}
 		if ($diff < 604800) { // moins d'une semaine
-			return $dayOfWeek . ' à ' . format_datetime('H\hi', $datetime);
+			return $dayOfWeek . ' à ' . date('H\hi', $time);
 		}
 		// plus d'une semaine
-		return 'le ' . format_datetime('d/m/Y', $datetime);
+		return 'le ' . date('d/m/Y', $time);
 	}
 
 }

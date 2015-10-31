@@ -19,7 +19,7 @@ class Mypagination {
 	
 	private $paginations = array();
 	private $config = array();
-	
+
 	public function __construct($config = null) {
 		if($config){
 			$this->initialize($config);
@@ -60,6 +60,29 @@ class Mypagination {
 		return $models;
 	}
 	
+	public function getScriptPaginationForId($id_pagination) {
+		return "<script type='text/javascript'>\n"
+				. "var pagination = $('.pagination#pagination-$id_pagination');\n"
+				. "var dataContainer = pagination.data('container');\n"
+				. "if(dataContainer === 'undefined') {\n"
+					. "container = pagination.parent();\n"
+				. "} else {\n"
+					. "container = $(dataContainer);\n"
+				. "}"
+				. "var linksPagination = pagination.find('a');\n"
+				. "linksPagination.click(function(e){\n"
+					. "e.preventDefault();"
+					. "var target_action = $(this).attr('href');\n"
+					. "$.ajax({\n"
+						. "url: target_action,\n"
+						. "success : function(html){\n"
+							. "container.replaceWith(html);\n"
+						. "}\n"
+					. "});\n"
+				. "})\n"
+		. "</script>\n";
+	}
+	
 	public function getPagination($id, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li'){
 		if(!isset($this->paginations[$id])) return '';
 		if(!$target_action){
@@ -69,15 +92,38 @@ class Mypagination {
 		$start = $pagination['start'];
 		$offset = $pagination['offset'];
 		$max = $pagination['max'];
-		$target = base_url($target_action);
-		
+		$target = $target_action;
 		if ($max > 0) {
-			$html = '<'.$mainWraper.' class="pagination" id="'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
+			$html = '<'.$mainWraper.' class="pagination" id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
 			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
 				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '/start/' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
 			}
-			$html .= '<'.$subWrapper.'><a href="' . $target . '/' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
+			$html .= '<'.$subWrapper.'><a href="' . $target . '/start/' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
 		}
+		return $html;
+	}
+	public function getPaginationAjax($id, $container = null, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li'){
+		if(!isset($this->paginations[$id])) return '';
+		if(!$target_action){
+			$target_action = current_url();
+		}
+		$data_container = '';
+		if($container){
+			$data_container = ' data-container="'.$container.'"';
+		}
+		$pagination = $this->paginations[$id];
+		$start = $pagination['start'];
+		$offset = $pagination['offset'];
+		$max = $pagination['max'];
+		$target = $target_action;
+		if ($max > 0) {
+			$html = '<'.$mainWraper.' class="pagination paginationAjax"'.$data_container.' id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
+			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
+				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '/start/' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
+			}
+			$html .= '<'.$subWrapper.'><a href="' . $target . '/start/' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
+		}
+		$html .= $this->getScriptPaginationForId($id);
 		return $html;
 	}
 	

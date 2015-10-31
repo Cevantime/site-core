@@ -5,17 +5,20 @@ if (!defined('BASEPATH'))
 
 if (!function_exists('pagination')) {
 
-	function pagination($total_number_of_elements, $target_action, $current_index = 0, $number_of_element_per_page = 10, $amplitude = 2, $jump = 1) {
-		$html = '';
-		if ($total_number_of_elements > 0) {
-			$html = '<ul class="pagination"> <li><a href="' . base_url() . $target_action . '/' . max(0, $current_index - $amplitude - $jump) . '">&laquo;</a></li>';
-			for ($i = max(0, $current_index - $amplitude); $i <= min($total_number_of_elements / $number_of_element_per_page, $current_index + $amplitude); $i++) {
-				$html .= '<li ' . (($i == $current_index) ? 'class="active"' : '') . '><a href="' . base_url() . $target_action . '/' . $i . '">' . ($i + 1) . '</a></li>';
-			}
-			$html .= '<li><a href="' . base_url() . $target_action . '/' . min(intval($total_number_of_elements / $number_of_element_per_page), $current_index + $amplitude + $jump) . '">&raquo;</a></li></ul>';
+	function pagination($id, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li') {
+		$CI =& get_instance();
+		if(!isset($CI->mypagination)){
+			return translate('Erreur de pagination');
 		}
-		return $html;
+		return $CI->mypagination->getPagination($id,$target_action, $amplitude, $jump,$mainWraper, $subWrapper);
 	}
-
+	
+	function pagination_ajax($id, $container = null, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li') {
+		$CI =& get_instance();
+		if(!isset($CI->mypagination)){
+			return translate('Erreur de pagination');
+		}
+		return $CI->mypagination->getPaginationAjax($id,$container,$target_action,$amplitude,$jump,$mainWraper,$subWrapper); 
+	}
 }
 ?>
