@@ -76,7 +76,16 @@ class Mypagination {
 					. "$.ajax({\n"
 						. "url: target_action,\n"
 						. "success : function(html){\n"
+							. "var height = container.height();"
 							. "container.replaceWith(html);\n"
+							. "if(dataContainer === 'undefined') {\n"
+								. "container = pagination.parent();\n"
+							. "} else {\n"
+								. "container = $(dataContainer);\n"
+							. "}"
+							. "$('html,body').animate({"
+								. "scrollTop :$('html,body').scrollTop() + container.height() - height"
+							. "}, 'fast');"
 						. "}\n"
 					. "});\n"
 				. "})\n"
@@ -100,6 +109,7 @@ class Mypagination {
 			}
 			$html .= '<'.$subWrapper.'><a href="' . $target . '/start/' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
 		}
+		else return '';
 		return $html;
 	}
 	public function getPaginationAjax($id, $container = null, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li'){
@@ -116,6 +126,7 @@ class Mypagination {
 		$offset = $pagination['offset'];
 		$max = $pagination['max'];
 		$target = $target_action;
+		
 		if ($max > 0) {
 			$html = '<'.$mainWraper.' class="pagination paginationAjax"'.$data_container.' id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
 			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
@@ -123,6 +134,7 @@ class Mypagination {
 			}
 			$html .= '<'.$subWrapper.'><a href="' . $target . '/start/' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
 		}
+		else return '';
 		$html .= $this->getScriptPaginationForId($id);
 		return $html;
 	}
