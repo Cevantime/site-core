@@ -290,10 +290,18 @@ abstract class DATA_Model extends CI_Model {
 
 	public function getRow($where = array(), $type = 'object', $columns = null) {
 		$this->makeExtendedJoins();
-		if ($columns !== null)
+		if ($columns !== null) {
 			$this->db->select($columns);
+		} else if($this->getTableName() !== $this->getBaseTableName()){
+			$columns = array();
+			foreach ($this->getSchema() as $col => $alias) {
+				$columns[] = $col.' AS '.$alias;
+			}
+			$columns = implode(',', $columns);
+			$this->db->select($columns);
+		}
 		$this->db->from($this->getTableName());
-		if ($where) {
+		if ($where !== null) {
 			$this->db->where($where);
 		}
 		$this->db->limit(1);
