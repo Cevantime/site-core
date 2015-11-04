@@ -261,7 +261,7 @@ class Modules {
 		if ($paths = self::find_multiple($file, $module, $base)) {
 			$datas = array();
 			foreach ($paths as $path) {
-				$path[0] && $datas = array_merge($datas, self::load_file($file, $path[0], $varname));
+				$path[0] && $datas = array_merge(self::load_file($file, $path[0], $varname),$datas);
 			}
 		}
 		return $datas;
