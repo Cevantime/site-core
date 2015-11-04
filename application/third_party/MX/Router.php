@@ -54,7 +54,6 @@ class MX_Router extends CI_Router
 				isset($segments[$v]) && $segments[$v] = str_replace('-', '_', $segments[$v]);
 			}
 		}
-		
 		$segments = $this->locate($segments);
 
 		if($this->located == -1)
@@ -111,13 +110,11 @@ class MX_Router extends CI_Router
 	{
 		$this->located = 0;
 		$ext = $this->config->item('controller_suffix').EXT;
-
 		/* use module route if available */
 		if (isset($segments[0]) && $routes = Modules::parse_routes($segments[0], implode('/', $segments)))
 		{
 			$segments = $routes;
 		}
-
 		/* get the segments array elements */
 		list($module, $directory, $controller) = array_pad($segments, 3, NULL);
 
@@ -167,7 +164,7 @@ class MX_Router extends CI_Router
 				}
 			}
 		}
-		
+
 		if( ! empty($this->directory) && $this->located !== -1) return;
 		$this->located = 0;
 		/* application sub-directory controller exists? */

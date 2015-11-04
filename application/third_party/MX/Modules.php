@@ -225,25 +225,77 @@ class Modules
 		return array(FALSE, $file);	
 	}
 	
+	/** 
+	* Find multiple files
+	* Scans for files located within modules directories.
+	* Also scans application directories for models, plugins and views.
+	* Generates fatal error if file not found.
+	**/
+	public static function find_multiple($file, $module, $base) 
+	{
+		$segments = explode('/', $file);
+
+		$file = array_pop($segments);
+		$file_ext = (pathinfo($file, PATHINFO_EXTENSION)) ? $file : $file.EXT;
+		
+		$path = ltrim(implode('/', $segments).'/', '/');	
+		$module ? $modules[$module] = $path : $modules = array();
+		$files = array();
+		if ( ! empty($segments)) 
+		{
+			$modules[array_shift($segments)] = ltrim(implode('/', $segments).'/','/');
+		}	
+		$fullpath = APPPATH.$base.$path;
+		if ($base == 'libraries/' OR $base == 'models/')
+		{
+			if(is_file($fullpath.ucfirst($file_ext))) $files[] = array($fullpath, ucfirst($file));
+		}
+		else
+		/* load non-class files */
+		if (is_file($fullpath.$file_ext)) $files[] = array($fullpath, $file);
+		foreach (Modules::$locations as $location => $offset) 
+		{					
+			foreach($modules as $module => $subpath) 
+			{			
+				$fullpath = $location.$module.'/'.$base.$subpath;
+				
+				if ($base == 'libraries/' OR $base == 'models/')
+				{
+					if(is_file($fullpath.ucfirst($file_ext))) $files[] = array($fullpath, ucfirst($file));
+				}
+				else
+				/* load non-class files */
+				if (is_file($fullpath.$file_ext)) $files[] = array($fullpath, $file);
+			}
+		}
+		
+		return $files;	
+	}
+	
+	public static function load_multiple($file,$module,$base){
+		$datas = null;
+		if($paths = self::find_multiple($file, $module, $base))
+		{
+			$datas = array();
+			foreach($paths as $path){
+				$path[0] && $datas = array_merge($datas, self::load_file($file,$module,$base));
+			}
+		}
+		return $datas;
+	}
 	/** Parse module routes **/
 	public static function parse_routes($module, $uri) 
 	{
 		/* load the route file */
 		if ( ! isset(self::$routes[$module])) 
 		{
-			if (list($path) = self::find('routes', $module, 'config/'))
-			{
-				$path && self::$routes[$module] = self::load_file('routes', $path, 'route');
-			}
+			self::$routes[$module] = self::load_multiple('routes', $module, 'route');
 		}
-
 		if ( ! isset(self::$routes[$module])) return;
-			
 		/* parse module routes */
 		foreach (self::$routes[$module] as $key => $val) 
 		{						
 			$key = str_replace(array(':any', ':num'), array('.+', '[0-9]+'), $key);
-			
 			if (preg_match('#^'.$key.'$#', $uri)) 
 			{							
 				if (strpos($val, '$') !== FALSE AND strpos($key, '(') !== FALSE) 
