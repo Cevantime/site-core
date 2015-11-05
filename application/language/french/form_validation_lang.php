@@ -45,7 +45,6 @@ $lang['valid_date']						= "The field {field} must be a valid date.";
 $lang['valid_range_date']				= "The field {field} must be a valid date range.";
 $lang['valid_geopos']                   = "The %s map doesn't have a correct position.";
 $lang['valid_multiple_geopos']          = "The %s map doesn't have a correct position.";
-$lang['file_maxdim']          = "The file uploaded in {field} has too big dimensions.";
 
 
 /* End of file form_validation_lang.php */

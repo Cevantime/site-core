@@ -27,7 +27,6 @@ $lang['file_size_max']					= "The file uploaded in {field} is too big (max size 
 $lang['file_size_min']					= "The file uploaded in {field} is too small (min size is {param}).";
 $lang['file_allowed_type']				= "The file uploaded in {field} should be {param}.";
 $lang['file_disallowed_type']			= "The file uploaded in {field} cannot be {param}.";
-$lang['file_image_maxdim']				= "The dimensions of the file uploaded in {field} are too big.";
 $lang['file_image_mindim']				= "The dimensions of the file uploaded in {field} are too small.";
 $lang['file_image_exactdim']			= "The file uploaded in {field} don't have the right dimensions.";
 $lang['is_exactly']						= "The field {field} contains a non valid value.";
