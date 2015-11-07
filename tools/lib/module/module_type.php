@@ -59,6 +59,7 @@ class Module_type {
 		}
 		
 		if(file_exists($this->installation_path.'/dbchanges')){
+			Module_utils::line('installing dbchanges');
 			$dbchangesPath = $this->installation_path.'/dbchanges';
 			$changeToAppend = '';
 			$files = Module_utils::list_files($dbchangesPath);
@@ -68,7 +69,7 @@ class Module_type {
 				$module['map']['dbchanges'][] = $file;
 				$filename = basename($file,'.sql');
 				$prefix = "--changeset module:install_{$this->name}_$filename\n";
-				if(strpos($changeLogTargetContent, $prefix) !== 0){
+				if(strpos($changeLogTargetContent, $prefix) !== false){
 					continue;
 				}
 				$suffix = "\n";
