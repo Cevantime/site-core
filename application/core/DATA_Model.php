@@ -113,7 +113,7 @@ abstract class DATA_Model extends CI_Model {
 		$datas = array();
 		foreach ($cols as $col) {
 			$colName = $col;
-			if (isset($post[$colName]) && $post[$colName]) {
+			if (isset($post[$colName])) {
 				$datas[$colName] = $post[$colName];
 			}
 		}

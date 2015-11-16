@@ -169,6 +169,8 @@ class Picture {
 	{
 		if( $destroy && isset( $this->m_img ) ) imagedestroy( $this->m_img );
 		$dst_img = imagecreatetruecolor( ceil($this->m_width), ceil($this->m_height) );
+		$background = imagecolorallocate($dst_img, 0, 0, 0);
+		imagecolortransparent($dst_img, $background);
 		imagealphablending($dst_img,FALSE);
 		imagesavealpha($dst_img,TRUE);
 		imagecopyresampled( $dst_img, $this->m_source_img, 0, 0, 0, 0, ceil($this->m_width), ceil($this->m_height), $this->m_source_width, $this->m_source_height );
@@ -299,37 +301,7 @@ class Picture {
 
 		// ratio image origine
 		$r = $this->m_width / $this->m_height;
-		/*		if( $r >= 1 )
-			{
-		if( $max_width > $max_height )
-		{
-		$this->m_width = $max_width;
-		$this->m_height = $max_width / $r;
-		}
-		else
-			if( $max_width <= $max_height )
-			{
-		$this->m_width = $max_height * $r;
-		$this->m_height = $max_height;
-		}
-		}
-		else
-			if( $r < 1 )
-			{
-		$r = 1 / $r;
-		if( $max_width >= $max_height )
-		{
-		$this->m_width = $max_width;
-		$this->m_height = $max_width * $r;
-		}
-		else
-			if( $max_width < $max_height )
-			{
-		$this->m_width = $max_height / $r;
-		$this->m_height = $max_height;
-		}
-		}*/
-
+	
 		// ratio image finale
 		$r2 = $max_width / $max_height;
 		if( $r >= $r2 )
@@ -343,7 +315,11 @@ class Picture {
 			$this->m_height = $max_width / $r;
 		}
 		$this->create();
-
+		//preserve transparency (again)
+		$background = imagecolorallocate($dst_img, 0, 0, 0);
+		imagecolortransparent($dst_img, $background);
+		imagealphablending($dst_img,FALSE);
+		imagesavealpha($dst_img,TRUE);
 		imagecopy( $dst_img, $this->m_img, 0, 0, abs($this->m_width - $max_width) / 2, abs($this->m_height - $max_height) / 2, $max_width, $max_height );
 		$this->m_img = $dst_img;
 		$this->m_cropped = true;

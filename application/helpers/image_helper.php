@@ -47,14 +47,15 @@ if (!function_exists('imageresize')) {
 		//verification qu'on charge bien une image
 		$ext_allowed = array('jpg','jpeg','gif','png');
 		
-		if(!in_array(strtolower(end(explode('.',$path_request))), $ext_allowed)) return $src;
+		$explode = explode('.',$path_request);
+		if(!in_array(strtolower(end($explode)), $ext_allowed)) return $src;
 
 		$source = $path_request;
 		$CI =& get_instance();
 		$CI->load->library('Picture', null,'picture');
 		$pict = $CI->picture;
 		//emplacement de mise en cache
-		$filename = $pict->makeFilename( str_replace(base_url(), '', $source.$width.$height.(($crop)?'c':'') )) ;
+		$filename = $pict->makeFilename( str_replace(base_url(), '', $width.'x'.$height.(($crop)?'.crop.':'.').$source )) ;
 		$searchfilename = 'application/cache/' . $filename;
 		
 		if( !file_exists( $searchfilename ) ){
