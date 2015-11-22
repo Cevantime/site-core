@@ -243,7 +243,7 @@ abstract class DATA_Model extends CI_Model {
 	 */
 	public function loadRow($where) {
 		$rows = $this->get($where, 'array');
-		if (count($rows) == 1) {
+		if ($rows && count($rows) == 1) {
 			$this->setDatas($rows[0]);
 			return true;
 		}
@@ -284,7 +284,6 @@ abstract class DATA_Model extends CI_Model {
 		if ($query->num_rows()) {
 			return $query->result($type);
 		}
-		
 		return false;
 	}
 
@@ -421,7 +420,6 @@ abstract class DATA_Model extends CI_Model {
 		foreach ($primaries as $col) {
 			unset($datas[$col]);
 		}
-		
 		if($this->isExtendingModel() && count($primaries)==1) {
 			$baseModel = $this->getBaseModelName();
 			$baseTable = $this->getBaseTableName();
@@ -440,8 +438,10 @@ abstract class DATA_Model extends CI_Model {
 				$idsToUpdate[] = $row->id;
 			}
 			if(!$idsToUpdate)return false;
-			$this->db->where_in($key, $idsToUpdate);
-			$ret = $this->db->update($baseTable, $datasToUpdate);
+			if($datasToUpdate){
+				$this->db->where_in($key, $idsToUpdate);
+				$ret = $this->db->update($baseTable, $datasToUpdate);
+			}
 			$extendingTables = $this->getExtendedTables();
 			$nbExtendingTables = count($extendingTables);
 			$extendingClasses = $this->getExtendedClasses();
@@ -457,7 +457,7 @@ abstract class DATA_Model extends CI_Model {
 				}
 				if($datasToUpdate){
 					$this->db->where_in($key, $idsToUpdate);
-					$this->db->update($table, $datasToUpdate);
+					$ret = $this->db->update($table, $datasToUpdate);
 				}
 			}
 			return $ret;
