@@ -51,15 +51,4 @@ if (!function_exists('day_of_week')) {
 
 }
 
-if (!function_exists('format_datetime')) {
-
-	function format_datetime($format, $datetime = '') {
-		if ($datetime == '') {
-			$datetime = date('d/m/Y');
-		}
-		$seconds = strtotime($datetime);
-		return date($format, $seconds);
-	}
-
-}
 ?>
