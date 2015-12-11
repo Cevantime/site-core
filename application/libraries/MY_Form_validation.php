@@ -1212,7 +1212,14 @@ class MY_Form_validation extends CI_Form_validation
         return FALSE;
     }
 
-
+	/**
+	 * Validate french zip code
+	 * @param string $zip
+	 * @return boolean
+	 */
+	public function valid_french_zip($zip) {
+		return preg_match('^(2[ab]|0[1-9]|[1-9][0-9])[0-9]{3}$', $zip);
+	}
 }
 /* End of file MY_form_validation.php */
 /* Location: ./application/libraries/MY_form_validation.php */
