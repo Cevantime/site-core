@@ -358,6 +358,8 @@ abstract class DATA_Model extends CI_Model {
 				$where = $key;
 			}
 		}
+		
+		return $this->getRow($where) != false;
 	}
 
 	public function toArray() {
