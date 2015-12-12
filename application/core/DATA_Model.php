@@ -344,6 +344,21 @@ abstract class DATA_Model extends CI_Model {
 	public function clear() {
 		$this->_datas = array();
 	}
+	
+	public function exists($key = null) {
+		$primaryColumns = $this->getPrimaryColumns();
+		$where = array();
+		if(!$key) {
+			$where = $this->buildPrimaryWhere();
+		}
+		else {
+			if(!is_array($key)){
+				$where = array($primaryColumns[0] => $key);
+			} else {
+				$where = $key;
+			}
+		}
+	}
 
 	public function toArray() {
 		$array = array();
