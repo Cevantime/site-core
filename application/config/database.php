@@ -63,7 +63,7 @@ $db['default']['cache_on'] = FALSE;
 $db['default']['cachedir'] = '';
 $db['default']['char_set'] = 'utf8';
 $db['default']['dbcollat'] = 'utf8_general_ci';
-$db['default']['swap_pre'] = '';
+$db['default']['swap_pre'] = '{PRE}';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
 
@@ -79,7 +79,7 @@ $db['alto']['cache_on'] = FALSE;
 $db['alto']['cachedir'] = '';
 $db['alto']['char_set'] = 'utf8';
 $db['alto']['dbcollat'] = 'utf8_general_ci';
-$db['alto']['swap_pre'] = '';
+$db['alto']['swap_pre'] = '{PRE}';
 $db['alto']['autoinit'] = TRUE;
 $db['alto']['stricton'] = FALSE;
 
@@ -95,7 +95,7 @@ $db['thibault']['cache_on'] = FALSE;
 $db['thibault']['cachedir'] = '';
 $db['thibault']['char_set'] = 'utf8';
 $db['thibault']['dbcollat'] = 'utf8_general_ci';
-$db['thibault']['swap_pre'] = '';
+$db['thibault']['swap_pre'] = '{PRE}';
 $db['thibault']['autoinit'] = TRUE;
 $db['thibault']['stricton'] = FALSE;
 

@@ -35,11 +35,10 @@ abstract class DATA_Model extends CI_Model {
 				$this->_extendedSchema = array();
 				$tables = $this->getExtendedTables();
 				foreach ($tables as $table){
-					$querySchema = $this->db->query('DESC '. $table);
-					$res = $querySchema->result();
+					$fields = $this->db->list_fields($table);
 					$cols = array();
-					foreach($res as $colInfo){
-						$cols[$table.'.'.$colInfo->Field] = $colInfo->Field;
+					foreach ($fields as $field) {
+						$cols[] = $field;
 					}
 					$this->_extendedSchema = array_merge($this->_extendedSchema, $cols);
 				}
@@ -49,11 +48,11 @@ abstract class DATA_Model extends CI_Model {
 		} else {
 			if ($this->_schema === null) {
 				$this->_schema = array();
-				$querySchema = $this->db->query('DESC ' . $this->getTableName());
-				$res = $querySchema->result();
+				$table = $this->getTableName();
+				$fields = $this->db->list_fields($table);
 				$cols = array();
-				foreach($res as $colInfo){
-					$cols[] = $colInfo->Field;
+				foreach ($fields as $field) {
+					$cols[] = $field;
 				}
 				$this->_schema = array_merge($this->_schema, $cols);
 				
@@ -171,10 +170,10 @@ abstract class DATA_Model extends CI_Model {
 			return;
 		}
 		$key = $primaryColumns[0];
-		$this->db->join($baseTable, $baseTable.'.'.$key.' = '.$this->getTableName().'.'.$key, 'left');
+		$this->db->join($baseTable, $this->db->dbprefix($baseTable).'.'.$key.' = '.$this->getTableName().'.'.$key, 'left');
 		for($i = 1; $i < count($extendingTables) - 1; $i++){
 			$table = $extendingTables[$i];
-			$this->db->join($table, $table.'.'.$key.' = '.$this->getTableName().'.'.$key, 'left');
+			$this->db->join($table, $this->db->dbprefix($table).'.'.$key.' = '.$this->getTableName().'.'.$key, 'left');
 		}
 		if($this->_joins){
 			foreach($this->_joins as $join){
@@ -286,7 +285,7 @@ abstract class DATA_Model extends CI_Model {
 		} else if($this->getTableName() !== $this->getBaseTableName()){
 			$columns = array();
 			foreach ($this->getSchema() as $col => $alias) {
-				$columns[] = $col.' AS '.$alias;
+				$columns[] = $this->db->dbprefix($col).' AS '.$alias;
 			}
 			$columns = implode(',', $columns);
 			$this->db->select($columns);
@@ -330,11 +329,11 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function getId($id, $type = 'object', $columns = null) {
-		return $this->getRow(array($this->getTableName().'.id' => $id),$type,$columns);
+		return $this->getRow(array($this->db->dbprefix($this->getTableName()).'.id' => $id),$type,$columns);
 	}
 
 	public function getAlias($alias, $type = 'object', $columns = null) {
-		return $this->getRow(array($this->getTableName().'alias' => $alias), $type, $columns);
+		return $this->getRow(array($this->db->dbprefix($this->getTableName()).'alias' => $alias), $type, $columns);
 		
 	}
 	
@@ -350,7 +349,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function deleteId($id) {
-		return $this->delete(array($this->getBaseTableName().'.id' => $id));
+		return $this->delete(array($this->db->dbprefix($this->getBaseTableName()).'.id' => $id));
 	}
 	
 	public function join($table, $cond, $type = '',$escape='') {
@@ -451,7 +450,7 @@ abstract class DATA_Model extends CI_Model {
 		if ($where === null) {
 			$where = array();
 			foreach ($primaries as $col) {
-				$where[$this->getTableName().'.'.$col] = $datas[$col];
+				$where[$this->db->dbprefix($this->getTableName()).'.'.$col] = $datas[$col];
 			}
 		}
 		foreach ($primaries as $col) {
@@ -539,9 +538,9 @@ abstract class DATA_Model extends CI_Model {
 		$where = array();
 		foreach ($this->getPrimaryColumns() as $col) {
 			if(isset($datas[$this->getTableName().'.'.$col])){
-				$where[$this->getTableName() . '.' . $col] = $datas[$this->getTableName().'.'.$col];
+				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$this->getTableName().'.'.$col];
 			}else if(isset($datas[$col])){
-				$where[$this->getTableName() . '.' . $col] = $datas[$col];
+				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$col];
 			}
 		}
 		return $where;
@@ -551,9 +550,9 @@ abstract class DATA_Model extends CI_Model {
 		$where = array();
 		foreach ($this->getPrimaryColumns() as $col) {
 			if (isset($datas[$col])) {
-				$where[$this->getTableName() . '.'.$col] = $datas[$col];
+				$where[$this->db->dbprefix($this->getTableName()) . '.'.$col] = $datas[$col];
 			} else if (isset($datas[$this->getTableName() . '.' . $col])) {
-				$where[$this->getTableName() . '.'.$col] = $datas[$this->getTableName() . '.' . $col];
+				$where[$this->db->dbprefix($this->getTableName()) . '.'.$col] = $datas[$this->getTableName() . '.' . $col];
 			} else {
 				return false;
 			}
@@ -633,7 +632,7 @@ abstract class DATA_Model extends CI_Model {
 				}
 				$values[] = implode(',', $datas);
 			}
-			$sql = 'INSERT INTO ' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ');';
+			$sql = 'INSERT INTO {PRE}' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ');';
 			return $this->db->query($sql);
 		}
 	}
@@ -678,13 +677,13 @@ abstract class DATA_Model extends CI_Model {
 			$this->loadExtendedInstance($model);
 			$dataColumns = array_diff($keys, $this->$model->getPrimaryColumns());
 			if(!$dataColumns){
-				$sql = 'INSERT IGNORE INTO ' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ')';
+				$sql = 'INSERT IGNORE INTO {PRE}' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ')';
 			} else {
 				$on_duplicate_col = array();
 				foreach ($dataColumns as $dataColumn) {
 					$on_duplicate_col[] = '`' . $dataColumn . '`=VALUES(`' . $dataColumn . '`)';
 				}
-				$sql = 'INSERT INTO ' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ')'
+				$sql = 'INSERT INTO {PRE}' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ')'
 						. ' ON DUPLICATE KEY UPDATE ' . implode(',', $on_duplicate_col) . ';';
 			}
 
@@ -725,8 +724,8 @@ abstract class DATA_Model extends CI_Model {
 			$this->loadRow(array('id' => $id));
 		}
 		$query = 'SELECT COUNT(*) as count
-        FROM ' . $this->getTableName() . '
-		WHERE ' . $this->getTableName() . '.' . $order . ' >= ' . $this->db->escape($this->{$order}) . '';
+        FROM {PRE}' . $this->getTableName() . '
+		WHERE {PRE}' . $this->getTableName() . '.' . $order . ' >= ' . $this->db->escape($this->{$order}) . '';
 		$res = $this->db->query($query)->result();
 		if (!$hasId) {
 			$this->clear();
@@ -781,8 +780,8 @@ abstract class DATA_Model extends CI_Model {
 	}
 	
 	public function getTrough($table, $model, $value, $key = 'id'){
-		$curTable = $this->getTableName();
-		$linkTable = $table;
+		$curTable = '{PRE}'.$this->getTableName();
+		$linkTable = '{PRE}'.$table;
 		if(is_array($value)){
 			$key = array_keys($value)[0];
 			$value = $value[0];
