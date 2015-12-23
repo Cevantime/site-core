@@ -129,6 +129,22 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return null;
 	}
+	
+	protected function beforeInsert($to_insert = null) {
+		
+	}
+	
+	protected function afterInsert($insert_id, $to_insert = null) {
+		
+	}
+	
+	protected function beforeUpdate($datas = null, $where= null) {
+		
+	}
+	
+	protected function afterUpdate($datas = null, $where = null) {
+		
+	}
 
 	public function build($post) {
 		$this->setDatas($this->buildRow($post));
@@ -382,6 +398,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function insert($datas = null) {
+		$this->beforeInsert($datas);
 		if ($datas == null) {
 			$datas = $this->toArray();
 			$this->clear();
@@ -403,6 +420,7 @@ abstract class DATA_Model extends CI_Model {
 		if(count($primaryCols) > 1){
 			// insert on multi primary cols
 			// not supported yet
+			$this->afterInsert($insert_id, $datas);
 			return $insertedId;
 		}
 		$key = $primaryCols[0];
@@ -418,10 +436,12 @@ abstract class DATA_Model extends CI_Model {
 			}
 			$this->db->insert($table, $datasToInsert);
 		}
+		$this->afterInsert($insert_id, $datas);
 		return $insertedId;
 	}
 
 	public function update($datas = null, $where = null) {
+		$this->beforeUpdate($datas, $where);
 		if ($datas == null) {
 			$datas = $this->toArray();
 			$this->clear();
@@ -458,6 +478,7 @@ abstract class DATA_Model extends CI_Model {
 			if($datasToUpdate){
 				$this->db->where_in($key, $idsToUpdate);
 				$ret = $this->db->update($baseTable, $datasToUpdate);
+				
 			}
 			$extendingTables = $this->getExtendedTables();
 			$nbExtendingTables = count($extendingTables);
@@ -477,9 +498,12 @@ abstract class DATA_Model extends CI_Model {
 					$ret = $this->db->update($table, $datasToUpdate);
 				}
 			}
+			$this->afterUpdate($datas, $where);
 			return $ret;
 		} else {
-			return $this->db->update($this->getTableName(), $datas, $where);
+			$ret = $this->db->update($this->getTableName(), $datas, $where);
+			$this->afterUpdate($datas, $where);
+			return $ret;
 		}
 		
 	}

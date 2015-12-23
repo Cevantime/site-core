@@ -11,7 +11,7 @@
 		
 		var defaults = {
 			innerWidth: "auto",
-			wrapHeight: "1000px",
+			wrapHeight: "100%",
 			paddingTop: "20%",
 			closeButton: '<span class="bt">OK</span>',
 			trigger: false,
