@@ -38,7 +38,7 @@ abstract class DATA_Model extends CI_Model {
 					$fields = $this->db->list_fields($table);
 					$cols = array();
 					foreach ($fields as $field) {
-						$cols[] = $field;
+						$cols[$table.'.'.$field] = $field;
 					}
 					$this->_extendedSchema = array_merge($this->_extendedSchema, $cols);
 				}
@@ -257,6 +257,14 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public abstract function getTableName();
+	
+	public function getValidationRulesForInsert(){
+		return array();
+	}
+	
+	public function getValidationRulesForUpdate(){
+		return array();
+	}
 
 	public function getPrimaryColumns() {
 		return array('id');
@@ -278,7 +286,6 @@ abstract class DATA_Model extends CI_Model {
 		if ($where !== null) {
 			$this->db->where($where);
 		}
-		
 		$query = $this->db->get();
 		if ($query->num_rows()) {
 			return $query->result($type);
