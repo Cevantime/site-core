@@ -148,7 +148,7 @@ class Core_CLI {
 		Core_utils::remove_full_directory("$name/.git");
 		$app_env = Core_utils::scan('Your APPLICATION_ENV (alto/thibault/default) :');
 		//putenv('APPLICATION_ENV=default');
-		Core_utils::sed($name . '/dbchanges/liquibase/update', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
+		Core_utils::sed($name . '/dbchanges/liquibase/update.php', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
 		$database = Core_utils::scan('Should your app have a database (Y/n) :');
 		$database = strtolower($database);
 		if (!$database OR $database === 'y') {
@@ -168,25 +168,25 @@ class Core_CLI {
 				$dbh = new PDO("mysql:host=$database_hostname", $root, $root_password);
 
 				$dbh->exec("CREATE DATABASE `$database_database`;
-						CREATE USER '$database_username'@'localhost' IDENTIFIED BY '$pass';
-						GRANT ALL ON `$database_password`.* TO '$database_username'@'localhost';
+						CREATE USER '$database_username'@'localhost' IDENTIFIED BY '$database_password';
+						GRANT ALL ON `$database_database`.* TO '$database_username'@'localhost';
 						FLUSH PRIVILEGES;") 
 				OR Core_utils::error(print_r($dbh->errorInfo(), true));
 				Core_utils::line('The database has been successfully created. Copying config...');
 				$database_ci_config = file_get_contents("$name/application/config/database.php");
 				//$db['default']['dbdriver'] = 'mysqli';
-				preg_match("#\$db\['default'\]\[.*\].*?=.*?;#", $database_ci_config, $matches);
+				preg_match('#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#', $database_ci_config, $matches);
 				$toAppend = "\n";
 				foreach ($matches as $match) {
 					foreach (array('hostname','username','password','database') as $prop){
-						$pattern = "#^\$db\['default'\]\[$prop\].*?=.*?;$#";
+						$pattern = '#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#';
 						if(preg_match($pattern, $match)){
 							$match = preg_replace($pattern, "\$db['$app_env'][$prop] = ".${'database_'.$prop}.";");
 						}
 					}
 					$toAppend .= "$match\n";
 				}
-				file_put_contents("$name/application/config/database.php", $toAppend);
+				file_put_contents("$name/application/config/database.php", $database_ci_config.$toAppend);
 				`php dbchanges/liquibase/update`;
 			} catch (PDOException $e) {
 				Core_utils::error(  $e->getMessage() );
