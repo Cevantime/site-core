@@ -3,49 +3,42 @@
 require_once dirname(__FILE__) . '/core_utils.php';
 require_once dirname(__FILE__) . '/core_exception.php';
 define('CORE_SOURCE', 'https://github.com/Cevantime/site-core.git');
+
 class Core_CLI {
 
 	public $module_sources;
-	
-    private static $commands = array(
-        'help' => 'help',
-        'install' => 'install',
+	private static $commands = array(
+		'help' => 'help',
+		'install' => 'install',
 		'update' => 'update',
 //        'search' => 'search',
-        'sources' => 'sources',
+		'sources' => 'sources',
 //        'upgrade-system' => 'upgrade_system',
 //        'version' => 'version',
-        '' => 'help' // default action
-    );
+		'' => 'help' // default action
+	);
 
-    function __construct($core_sources)
-    {
-        $this->module_sources = $core_sources;
-    }
+	function __construct($core_sources) {
+		$this->module_sources = $core_sources;
+	}
 
-    function execute($command, $args = array())
-    {
-        if (!array_key_exists($command, self::$commands))
-        {
-            $this->failtown("Unknown action: $command");
-            return;
-        }
-        try
-        {
-            $method = self::$commands[$command];
-            $this->$method($args);
-        }
-        catch (Exception $ex)
-        {
-            return $this->failtown($ex->getMessage());
-        }
-    }
+	function execute($command, $args = array()) {
+		if (!array_key_exists($command, self::$commands)) {
+			$this->failtown("Unknown action: $command");
+			return;
+		}
+		try {
+			$method = self::$commands[$command];
+			$this->$method($args);
+		} catch (Exception $ex) {
+			return $this->failtown($ex->getMessage());
+		}
+	}
 
-    private function index($args)
-    {
-        Core_utils::line('Core (v' . CORE_VERSION . ')');
-        Core_utils::line('For help: `php tools/module help`');
-    }
+	private function index($args) {
+		Core_utils::line('Core (v' . CORE_VERSION . ')');
+		Core_utils::line('For help: `php tools/module help`');
+	}
 
 //    private function upgrade_system() {
 //        $tool_dir = dirname(__FILE__) . '/../../';
@@ -75,7 +68,6 @@ class Core_CLI {
 //        // Tell the user the story of what just happened
 //        Module_utils::notice('Spark manager has been upgraded to ' . $source->version . '!');
 //    }
-
 //    // list the installed sparks
 //    private function lister()
 //    {
@@ -90,24 +82,22 @@ class Core_CLI {
 //            }
 //        }
 //    }
-
 //    private function version()
 //    {
 //        Module_utils::line(CORE_VERSION);
 //    }
 
-    private function help()
-    {
-        Core_utils::line('install         # Install a spark');
-        Core_utils::line('reinstall       # Reinstall a spark');
-        Core_utils::line('remove          # Remove a spark');
+	private function help() {
+		Core_utils::line('install         # Install a spark');
+		Core_utils::line('reinstall       # Reinstall a spark');
+		Core_utils::line('remove          # Remove a spark');
 //        Module_utils::line('list            # List installed sparks');
 //        Module_utils::line('search          # Search for a spark');
-        Core_utils::line('sources         # Display the spark source URL(s)');
+		Core_utils::line('sources         # Display the spark source URL(s)');
 //        Module_utils::line('upgrade-system  # Update Sparks Manager to latest version (does not upgrade any of your installed sparks)');
-        Core_utils::line('version         # Display the installed spark version');
-        Core_utils::line('help            # Print This message');
-    }
+		Core_utils::line('version         # Display the installed spark version');
+		Core_utils::line('help            # Print This message');
+	}
 
 //    private function search($args)
 //    {
@@ -125,69 +115,110 @@ class Core_CLI {
 //        }
 //    }
 
-    private function sources()
-    {
-        
-        Core_utils::line(CORE_SOURCE);
-        
-    }
+	private function sources() {
 
-    private function failtown($error_message)
-    {
-        Core_utils::error('Uh-oh!');
-        Core_utils::error($error_message);
+		Core_utils::line(CORE_SOURCE);
 	}
 
-    private function install($args)
-    {
-		$name = realpath(__DIR__.'/../../../');
+	private function failtown($error_message) {
+		Core_utils::error('Uh-oh!');
+		Core_utils::error($error_message);
+	}
+
+	private function install($args) {
+		$name = realpath(__DIR__ . '/../../../');
 		Core_utils::line('installing the module in ' . $name);
 		$cmd = '';
 		$cmd .= "git init $name;";
 		$cmd = "cd $name;";
 
-		$cmd .= 'git clone '.CORE_SOURCE.';';
+		$cmd .= 'git clone ' . CORE_SOURCE . ';';
 
 		$cmd .= "git pull origin master";
 		Core_utils::line("executing : $cmd");
 		exec($cmd);
-        
 
-        if (!file_exists("$name/site-core/application")) {
-            throw new Core_exception('Ooops. It seems that the core couldn\'t be installed');
-        }
 
-	Core_utils::full_move("$name/site-core", "$name/");
-	Core_utils::remove_full_directory("$name/site-core");
-        Core_utils::remove_full_directory("$name/.git");
+		if (!file_exists("$name/site-core/application")) {
+			throw new Core_exception('Ooops. It seems that the core couldn\'t be installed');
+		}
 
-        Core_utils::notice('Installation completed - You\'re on fire!');
-    }
-	
-	
-    /**
-     * Prepares the command line arguments for use.
-     *
-     * Usage:
-     * list($flats, $flags) = $this->prep_args($args);
-     *
-     * @param   array   the arguments array
-     * @return  array   the flats and flags
-     */
-    private function prep_args($args)
-    {
+		Core_utils::full_move("$name/site-core", "$name/");
+		Core_utils::remove_full_directory("$name/site-core");
+		Core_utils::remove_full_directory("$name/.git");
+		$app_env = Core_utils::scan('Your APPLICATION_ENV (alto/thibault/default) :');
+		//putenv('APPLICATION_ENV=default');
+		Core_utils::sed($name . '/dbchanges/liquibase/update', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
+		$database = Core_utils::scan('Should your app have a database (Y/n) :');
+		$database = strtolower($database);
+		if (!$database OR $database === 'y') {
+			$database = true;
+		} else {
+			$database = false;
+		}
+		if ($database) {
+			Core_utils::line("The script will now install your new database. It assumes you use a mysql database.");
+			$database_hostname = Core_utils::scan('Database host (localhost/ip address) : ');
+			$root = Core_utils::scan('root username (probably root) : ');
+			$root_password = Core_utils::scan('root password : ');
+			$database_database = Core_utils::scan('Database name : ');
+			$database_username = Core_utils::scan('Database user : ');
+			$database_password = Core_utils::scan('Database password : ');
+			try {
+				$dbh = new PDO("mysql:host=$database_hostname", $root, $root_password);
 
-        $flats = array();
-        $flags = array();
+				$dbh->exec("CREATE DATABASE `$database_database`;
+						CREATE USER '$database_username'@'localhost' IDENTIFIED BY '$pass';
+						GRANT ALL ON `$database_password`.* TO '$database_username'@'localhost';
+						FLUSH PRIVILEGES;") 
+				OR Core_utils::error(print_r($dbh->errorInfo(), true));
+				Core_utils::line('The database has been successfully created. Copying config...');
+				$database_ci_config = file_get_contents("$name/application/config/database.php");
+				//$db['default']['dbdriver'] = 'mysqli';
+				preg_match("#\$db\['default'\]\[.*\].*?=.*?;#", $database_ci_config, $matches);
+				$toAppend = "\n";
+				foreach ($matches as $match) {
+					foreach (array('hostname','username','password','database') as $prop){
+						$pattern = "#^\$db\['default'\]\[$prop\].*?=.*?;$#";
+						if(preg_match($pattern, $match)){
+							$match = preg_replace($pattern, "\$db['$app_env'][$prop] = ".${'database_'.$prop}.";");
+						}
+					}
+					$toAppend .= "$match\n";
+				}
+				file_put_contents("$name/application/config/database.php", $toAppend);
+				`php dbchanges/liquibase/update`;
+			} catch (PDOException $e) {
+				Core_utils::error(  $e->getMessage() );
+			}
 
-        foreach($args as $arg)
-        {
-            preg_match('/^(\-?[a-zA-Z])([^\s]*)$/', $arg, $matches);
-            if (count($matches) != 3) continue;
-            $matches[0][0] == '-' ? $flags[$matches[1][1]] = $matches[2] : $flats[] = $matches[0];
-        }
+			$conn = null;
+		}
+		Core_utils::notice('Installation completed - You\'re on fire!');
+	}
 
-        return array($flats, $flags);
-    }
+	/**
+	 * Prepares the command line arguments for use.
+	 *
+	 * Usage:
+	 * list($flats, $flags) = $this->prep_args($args);
+	 *
+	 * @param   array   the arguments array
+	 * @return  array   the flats and flags
+	 */
+	private function prep_args($args) {
+
+		$flats = array();
+		$flags = array();
+
+		foreach ($args as $arg) {
+			preg_match('/^(\-?[a-zA-Z])([^\s]*)$/', $arg, $matches);
+			if (count($matches) != 3)
+				continue;
+			$matches[0][0] == '-' ? $flags[$matches[1][1]] = $matches[2] : $flats[] = $matches[0];
+		}
+
+		return array($flats, $flags);
+	}
 
 }

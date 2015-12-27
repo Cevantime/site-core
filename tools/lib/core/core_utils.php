@@ -126,5 +126,22 @@ class Core_utils {
 		}
 		return $files;
 	}
-
+	
+	static function scan($label) {
+		$input = readline($label);
+		readline_add_history($input);
+		return $input;
+	}
+	
+	static function sed($filename, $pattern, $replace) {
+		$file_contents = file_get_contents($filename);
+		$rep = preg_replace($pattern, $replace, $file_contents);
+		
+		if($rep) {
+			$new = $rep;
+		} else {
+			$new = $file_contents;
+		}
+		file_put_contents($filename, $new);
+	}
 }
