@@ -172,22 +172,25 @@ class Core_CLI {
 						GRANT ALL ON `$database_database`.* TO '$database_username'@'localhost';
 						FLUSH PRIVILEGES;") 
 				OR Core_utils::error(print_r($dbh->errorInfo(), true));
-				Core_utils::line('The database has been successfully created. Copying config...');
-				$database_ci_config = file_get_contents("$name/application/config/database.php");
-				//$db['default']['dbdriver'] = 'mysqli';
-				preg_match('#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#', $database_ci_config, $matches);
-				$toAppend = "\n";
-				foreach ($matches as $match) {
-					foreach (array('hostname','username','password','database') as $prop){
-						$pattern = '#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#';
-						if(preg_match($pattern, $match)){
-							$match = preg_replace($pattern, "\$db['$app_env'][$prop] = ".${'database_'.$prop}.";");
+				if($app_env != 'default') {
+					Core_utils::line('The database has been successfully created. Copying config...');
+					$database_ci_config = file_get_contents("$name/application/config/database.php");
+					//$db['default']['dbdriver'] = 'mysqli';
+					preg_match_all('#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#', $database_ci_config, $matches);
+					$toAppend = "\n";
+					$matches = $matches[0];
+					foreach ($matches as $match) {
+						foreach (array('hostname','username','password','database') as $prop){
+							$pattern = '#\$db.*?\[\'default\'\].*?\[\''.$prop.'\'?\].*?=.*?;#';
+							if(preg_match($pattern, $match)){
+								$match = preg_replace($pattern, "\$db['$app_env']['$prop'] = '".${'database_'.$prop}."';", $match);
+							}
 						}
+						$toAppend .= "$match\n";
 					}
-					$toAppend .= "$match\n";
+					file_put_contents("$name/application/config/database.php", $database_ci_config.$toAppend);
 				}
-				file_put_contents("$name/application/config/database.php", $database_ci_config.$toAppend);
-				`php dbchanges/liquibase/update`;
+				`php dbchanges/liquibase/update.php`;
 			} catch (PDOException $e) {
 				Core_utils::error(  $e->getMessage() );
 			}
