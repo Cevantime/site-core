@@ -20,9 +20,10 @@ abstract class DATA_Model extends CI_Model {
 	protected $_extendedClasses;
 	protected $_extendedInstances;
 	protected $_joins;
+	protected $_compileQueryOnly = false;
 
 	protected function getModelName() {
-		if(!$this->_modelName){
+		if (!$this->_modelName) {
 			$class = get_class();
 			$this->_modelName = strtolower($class);
 		}
@@ -30,15 +31,15 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function getSchema($extended = true) {
-		if($extended){
+		if ($extended) {
 			if ($this->_extendedSchema === null) {
 				$this->_extendedSchema = array();
 				$tables = $this->getExtendedTables();
-				foreach ($tables as $table){
+				foreach ($tables as $table) {
 					$fields = $this->db->list_fields($table);
 					$cols = array();
 					foreach ($fields as $field) {
-						$cols[$table.'.'.$field] = $field;
+						$cols[$table . '.' . $field] = $field;
 					}
 					$this->_extendedSchema = array_merge($this->_extendedSchema, $cols);
 				}
@@ -55,19 +56,18 @@ abstract class DATA_Model extends CI_Model {
 					$cols[] = $field;
 				}
 				$this->_schema = array_merge($this->_schema, $cols);
-				
 			}
 			return $this->_schema;
 		}
 	}
-	
+
 	public function getExtendedClasses() {
-		if(!$this->_extendedClasses) {
+		if (!$this->_extendedClasses) {
 			$currentClass = get_class($this);
 			$parentClasses = array_values(class_parents($this));
 			// put the base table first
 			$nb_classes = count($parentClasses);
-			for($i=$nb_classes-3; $i>=0; $i--){
+			for ($i = $nb_classes - 3; $i >= 0; $i--) {
 				$parentClass = $parentClasses[$i];
 				$this->_extendedClasses[] = $parentClass;
 			}
@@ -76,24 +76,28 @@ abstract class DATA_Model extends CI_Model {
 		return $this->_extendedClasses;
 	}
 	
+	public function compileQueryOnly($compile) {
+		$this->_compileQueryOnly = $compile;
+	}
+
 	public function getBaseClass() {
 		return $this->getExtendedClasses()[0];
 	}
-	
+
 	protected function loadExtendedInstance($model) {
-		if(!isset($this->$model)){
+		if (!isset($this->$model)) {
 			$classname = ucfirst($model);
 			$this->$model = new $classname();
 		}
 	}
-	
+
 	/**
 	 * if table name is users_admin_root, extended tables will be :
 	 * [users, users_admin, user_admin_root]
 	 * @return type
 	 */
 	public function getExtendedTables() {
-		if($this->_extendedTables === null) {
+		if ($this->_extendedTables === null) {
 			$this->_extendedTables = array();
 			$extendedClasses = $this->getExtendedClasses();
 			foreach ($extendedClasses as $extendedClass) {
@@ -102,9 +106,8 @@ abstract class DATA_Model extends CI_Model {
 				$this->_extendedTables[] = $this->$model->getTableName();
 			}
 		}
-		
+
 		return $this->_extendedTables;
-		
 	}
 
 	public function buildRow($post) {
@@ -118,13 +121,12 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return $datas;
 	}
-	
-	public function getData($name){
-		if(isset($this->_datas[$name])){
+
+	public function getData($name) {
+		if (isset($this->_datas[$name])) {
 			return $this->_datas[$name];
-		}
-		else if(isset($this->_datas[$this->getTableName ().'.'.$name])){
-			return $this->_datas[$this->getTableName ().'.'.$name];
+		} else if (isset($this->_datas[$this->getTableName() . '.' . $name])) {
+			return $this->_datas[$this->getTableName() . '.' . $name];
 		}
 		return null;
 	}
@@ -138,9 +140,9 @@ abstract class DATA_Model extends CI_Model {
 		$this->prepareSearch($limit, $offset, $search, $columns);
 		return $this->get();
 	}
-	
+
 	protected function makeExtendedJoins() {
-		if(!$this->isExtendingModel()){
+		if (!$this->isExtendingModel()) {
 			return;
 		}
 		$extendingTables = $this->getExtendedTables();
@@ -148,25 +150,25 @@ abstract class DATA_Model extends CI_Model {
 		$baseModel = $this->getBaseModelName();
 		$this->loadExtendedInstance($baseModel);
 		$primaryColumns = $this->$baseModel->getPrimaryColumns();
-		if(count($primaryColumns)>1) {
+		if (count($primaryColumns) > 1) {
 			//multi primary column link
 			// not supported yet
 			return;
 		}
 		$key = $primaryColumns[0];
-		$this->db->join($baseTable, $this->db->dbprefix($baseTable).'.'.$key.' = '.$this->getTableName().'.'.$key, 'left');
-		for($i = 1; $i < count($extendingTables) - 1; $i++){
+		$this->db->join($baseTable, $this->db->dbprefix($baseTable) . '.' . $key . ' = ' . $this->getTableName() . '.' . $key, 'left');
+		for ($i = 1; $i < count($extendingTables) - 1; $i++) {
 			$table = $extendingTables[$i];
-			$this->db->join($table, $this->db->dbprefix($table).'.'.$key.' = '.$this->getTableName().'.'.$key, 'left');
+			$this->db->join($table, $this->db->dbprefix($table) . '.' . $key . ' = ' . $this->getTableName() . '.' . $key, 'left');
 		}
-		if($this->_joins){
-			foreach($this->_joins as $join){
-				$this->db->join($join['table'],$join['cond'],$join['type'],$join['escape']);
+		if ($this->_joins) {
+			foreach ($this->_joins as $join) {
+				$this->db->join($join['table'], $join['cond'], $join['type'], $join['escape']);
 			}
 		}
 		$this->_joins = array();
 	}
-	
+
 	protected function isExtendingModel() {
 		return count($this->getExtendedTables()) > 1;
 	}
@@ -174,7 +176,7 @@ abstract class DATA_Model extends CI_Model {
 	protected function getBaseTableName() {
 		return $this->getExtendedTables()[0];
 	}
-	
+
 	protected function getBaseModelName() {
 		return strtolower($this->getExtendedClasses()[0]);
 	}
@@ -205,7 +207,7 @@ abstract class DATA_Model extends CI_Model {
 		$columns = array();
 		foreach ($schema as $col) {
 			if ($col->DATA_TYPE === 'varchar' || $col->DATA_TYPE === 'text') {
-				$columns[] = $this->getTableName().'.'.$col->COLUMN_NAME;
+				$columns[] = $this->getTableName() . '.' . $col->COLUMN_NAME;
 			}
 		}
 		return $columns;
@@ -257,34 +259,82 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public abstract function getTableName();
-	
-	public function getValidationRulesForInsert(){
-		return array();
+
+	public function validationRulesForInsert($datas) {
+		
 	}
-	
-	public function getValidationRulesForUpdate(){
-		return array();
+
+	public function validationRulesForUpdate($datas) {
+		
+	}
+
+	public function uploadPaths() {
+		return false;
 	}
 
 	public function getPrimaryColumns() {
 		return array('id');
 	}
 
-	public function get($where = null, $type = 'object', $columns = null) {
-		$this->makeExtendedJoins();
-		if ($columns !== null) {
-			$this->db->select($columns);
-		} else if($this->getTableName() !== $this->getBaseTableName()){
-			$columns = array();
-			foreach ($this->getSchema() as $col => $alias) {
-				$columns[] = $this->db->dbprefix($col).' AS '.$alias;
+	public function fromPost() {
+		return $this->fromDatas();
+	}
+
+	public function fromDatas($datas = null) {
+		$primaries = $this->getPrimaryColumns();
+		$isUpdate = true;
+		$input = $datas ? $datas : $_POST;
+		
+		foreach ($primaries as $primary) {
+			if (!isset($input[$primary])) {
+				$isUpdate = false;
+				break;
 			}
-			$columns = implode(',', $columns);
-			$this->db->select($columns);
 		}
-		$this->db->from($this->getTableName());
-		if ($where !== null) {
-			$this->db->where($where);
+		$rules = $isUpdate ? $this->validationRulesForUpdate($input) : $this->validationRulesForInsert($input);
+		$this->load->library('form_validation');
+		if ($datas) {
+			$this->form_validation->set_data($datas);
+		}
+		$this->form_validation->set_rules($rules);
+		if (!$this->form_validation->run()) {
+			return false;
+		}
+		$uploadPaths = $this->uploadPaths();
+		if ($uploadPaths) {
+			$files = $_FILES;
+			$this->load->library('upload');
+			if (is_array($uploadPaths)) {
+				foreach ($files as $key => $filedata) {
+					$uploadPath = isset($uploadPaths[$key]) ? $uploadPaths[$key] : '';
+					$this->doUpload($datas, $uploadPath, $key);
+				}
+			} else {
+				$uploadPath = $uploadPaths;
+				$this->doUpload($datas, $uploadPath, $key);
+			}
+		}
+		if ($datas) {
+			return $this->save($this->filterInvalidFields($datas));
+		}
+		return $this->save($this->filterInvalidFields($_POST));
+	}
+	
+	private function doUpload($datas, $uploadPath, $key) {
+		$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
+		if ($this->upload->do_upload($key)) {
+			if ($datas) {
+				$datas[$key] = $uploadPath . '/' . $this->_ci_upload->file_name;
+			} else {
+				$_POST[$key] = $uploadPath . '/' . $this->_ci_upload->file_name;
+			}
+		}
+	}
+	
+	public function get($where = null, $type = 'object', $columns = null) {
+		$this->prepareGet($where, $type, $columns);
+		if($this->_compileQueryOnly){
+			return $this->db->get_compiled_select();
 		}
 		$query = $this->db->get();
 		if ($query->num_rows()) {
@@ -292,15 +342,15 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return false;
 	}
-
-	public function getRow($where = array(), $type = 'object', $columns = null) {
+	
+	public function prepareGet($where = array(), $type = 'object', $columns = null){
 		$this->makeExtendedJoins();
 		if ($columns !== null) {
 			$this->db->select($columns);
-		} else if($this->getTableName() !== $this->getBaseTableName()){
+		} else if ($this->getTableName() !== $this->getBaseTableName()) {
 			$columns = array();
 			foreach ($this->getSchema() as $col => $alias) {
-				$columns[] = $col.' AS '.$alias;
+				$columns[] = $this->db->dbprefix($col) . ' AS ' . $alias;
 			}
 			$columns = implode(',', $columns);
 			$this->db->select($columns);
@@ -309,8 +359,13 @@ abstract class DATA_Model extends CI_Model {
 		if ($where !== null) {
 			$this->db->where($where);
 		}
-		$this->db->limit(1);
+	}
+
+	public function getRow($where = array(), $type = 'object', $columns = null) {
+		$this->prepareGet($where, $type, $columns);
 		
+		$this->db->limit(1);
+
 		$query = $this->db->get();
 		if ($query->num_rows()) {
 			$res = $query->result($type);
@@ -320,14 +375,13 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function getId($id, $type = 'object', $columns = null) {
-		return $this->getRow(array($this->db->dbprefix($this->getTableName()).'.id' => $id),$type,$columns);
+		return $this->getRow(array($this->db->dbprefix($this->getTableName()) . '.id' => $id), $type, $columns);
 	}
 
 	public function getAlias($alias, $type = 'object', $columns = null) {
-		return $this->getRow(array($this->db->dbprefix($this->getTableName()).'alias' => $alias), $type, $columns);
-		
+		return $this->getRow(array($this->db->dbprefix($this->getTableName()) . 'alias' => $alias), $type, $columns);
 	}
-	
+
 	public function delete($where = null) {
 		if ($where === null) {
 			$where = array();
@@ -340,31 +394,30 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function deleteId($id) {
-		return $this->delete(array($this->db->dbprefix($this->getBaseTableName()).'.id' => $id));
+		return $this->delete(array($this->db->dbprefix($this->getBaseTableName()) . '.id' => $id));
 	}
-	
-	public function join($table, $cond, $type = '',$escape='') {
-		$this->_joins[] = array('table'=>$table, 'cond'=>$cond, 'type'=>$type, 'escape'=>$escape);
+
+	public function join($table, $cond, $type = '', $escape = '') {
+		$this->_joins[] = array('table' => $table, 'cond' => $cond, 'type' => $type, 'escape' => $escape);
 	}
 
 	public function clear() {
 		$this->_datas = array();
 	}
-	
+
 	public function exists($key = null) {
 		$primaryColumns = $this->getPrimaryColumns();
 		$where = array();
-		if(!$key) {
+		if (!$key) {
 			$where = $this->buildPrimaryWhere();
-		}
-		else {
-			if(!is_array($key)){
+		} else {
+			if (!is_array($key)) {
 				$where = array($primaryColumns[0] => $key);
 			} else {
 				$where = $key;
 			}
 		}
-		
+
 		return $this->getRow($where) != false;
 	}
 
@@ -386,7 +439,17 @@ abstract class DATA_Model extends CI_Model {
 	public function __set($name, $value) {
 		$this->_datas[$this->getTableName() . '.' . $name] = $value;
 	}
-
+	
+	public function filterInvalidFields(&$datas) {
+		$schema = $this->getSchema();
+		foreach ($datas as $key => $data){
+			if(empty($data) || !in_array($key, $schema)){
+				unset($datas[$key]);
+			}
+		}
+		return $datas;
+	}
+//sh -c 'STEAM_FRAME_FORCE_CLOSE=1 steam' %U
 	public function insert($datas = null) {
 		if ($datas == null) {
 			$datas = $this->toArray();
@@ -397,30 +460,32 @@ abstract class DATA_Model extends CI_Model {
 		$this->loadExtendedInstance($baseModel);
 		$specificSchema = $this->$baseModel->getSchema(false);
 		$datasToInsert = array();
-		foreach($specificSchema as $col){
-			if(array_key_exists($col, $datas))$datasToInsert[$col] = $datas[$col];
+		foreach ($specificSchema as $col) {
+			if (array_key_exists($col, $datas))
+				$datasToInsert[$col] = $datas[$col];
 		}
 		$this->db->insert($this->getBaseTableName(), $datasToInsert);
-		
-		$insertedId =  $this->db->insert_id();
+
+		$insertedId = $this->db->insert_id();
 		$extendedTables = $this->getExtendedTables();
 		$extendedClasses = $this->getExtendedClasses();
 		$primaryCols = $this->$baseModel->getPrimaryColumns();
-		if(count($primaryCols) > 1){
+		if (count($primaryCols) > 1) {
 			// insert on multi primary cols
 			// not supported yet
 			return $insertedId;
 		}
 		$key = $primaryCols[0];
-		$datas[$key] =  $insertedId;
-		for($i=1; $i<count($extendedTables); $i++){
+		$datas[$key] = $insertedId;
+		for ($i = 1; $i < count($extendedTables); $i++) {
 			$table = $extendedTables[$i];
 			$model = strtolower($extendedClasses[$i]);
 			$this->loadExtendedInstance($model);
 			$specificSchema = $this->$model->getSchema(false);
 			$datasToInsert = array();
-			foreach($specificSchema as $col){
-				if(array_key_exists($col, $datas))$datasToInsert[$col] = $datas[$col];
+			foreach ($specificSchema as $col) {
+				if (array_key_exists($col, $datas))
+					$datasToInsert[$col] = $datas[$col];
 			}
 			$this->db->insert($table, $datasToInsert);
 		}
@@ -437,48 +502,51 @@ abstract class DATA_Model extends CI_Model {
 		if ($where === null) {
 			$where = array();
 			foreach ($primaries as $col) {
-				$where[$this->db->dbprefix($this->getTableName()).'.'.$col] = $datas[$col];
+				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$col];
 			}
 		}
 		foreach ($primaries as $col) {
 			unset($datas[$col]);
 		}
-		if($this->isExtendingModel() && count($primaries)==1) {
+		if ($this->isExtendingModel() && count($primaries) == 1) {
 			$baseModel = $this->getBaseModelName();
 			$baseTable = $this->getBaseTableName();
 			$this->loadExtendedInstance($baseModel);
 			$cols = $this->$baseModel->getSchema();
 			$datasToUpdate = array();
 			foreach ($cols as $col) {
-				if(isset($datas[$col])) {
-					if(array_key_exists($col, $datas))$datasToUpdate[$col] = $datas[$col];
+				if (isset($datas[$col])) {
+					if (array_key_exists($col, $datas))
+						$datasToUpdate[$col] = $datas[$col];
 				}
 			}
 			$key = $primaries[0];
-			$idsToUpdateRow = $this->get($where, 'object', array($this->getTableName().'.'.$key));
+			$idsToUpdateRow = $this->get($where, 'object', array($this->getTableName() . '.' . $key));
 			$idsToUpdate = array();
-			foreach ($idsToUpdateRow as $row){
+			foreach ($idsToUpdateRow as $row) {
 				$idsToUpdate[] = $row->id;
 			}
-			if(!$idsToUpdate)return false;
-			if($datasToUpdate){
+			if (!$idsToUpdate)
+				return false;
+			if ($datasToUpdate) {
 				$this->db->where_in($key, $idsToUpdate);
 				$ret = $this->db->update($baseTable, $datasToUpdate);
 			}
 			$extendingTables = $this->getExtendedTables();
 			$nbExtendingTables = count($extendingTables);
 			$extendingClasses = $this->getExtendedClasses();
-			for($i = 1; $i < $nbExtendingTables; $i++){
+			for ($i = 1; $i < $nbExtendingTables; $i++) {
 				$table = $extendingTables[$i];
 				$model = strtolower($extendingClasses[$i]);
 				$cols = $this->$model->getSchema(false);
 				$datasToUpdate = array();
 				foreach ($cols as $col) {
 					if (isset($datas[$col])) {
-						if(array_key_exists($col, $datas))$datasToUpdate[$col] = $datas[$col];
+						if (array_key_exists($col, $datas))
+							$datasToUpdate[$col] = $datas[$col];
 					}
 				}
-				if($datasToUpdate){
+				if ($datasToUpdate) {
 					$this->db->where_in($key, $idsToUpdate);
 					$ret = $this->db->update($table, $datasToUpdate);
 				}
@@ -487,9 +555,8 @@ abstract class DATA_Model extends CI_Model {
 		} else {
 			return $this->db->update($this->getTableName(), $datas, $where);
 		}
-		
 	}
-	
+
 	protected function buildWhere() {
 		
 	}
@@ -515,14 +582,14 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	protected function buildPrimaryWhere($datas = null) {
-		if($datas == null){
+		if ($datas == null) {
 			$datas = $this->toArray();
 		}
 		$where = array();
 		foreach ($this->getPrimaryColumns() as $col) {
-			if(isset($datas[$this->getTableName().'.'.$col])){
-				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$this->getTableName().'.'.$col];
-			}else if(isset($datas[$col])){
+			if (isset($datas[$this->getTableName() . '.' . $col])) {
+				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$this->getTableName() . '.' . $col];
+			} else if (isset($datas[$col])) {
 				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$col];
 			}
 		}
@@ -533,9 +600,9 @@ abstract class DATA_Model extends CI_Model {
 		$where = array();
 		foreach ($this->getPrimaryColumns() as $col) {
 			if (isset($datas[$col])) {
-				$where[$this->db->dbprefix($this->getTableName()) . '.'.$col] = $datas[$col];
+				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$col];
 			} else if (isset($datas[$this->getTableName() . '.' . $col])) {
-				$where[$this->db->dbprefix($this->getTableName()) . '.'.$col] = $datas[$this->getTableName() . '.' . $col];
+				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$this->getTableName() . '.' . $col];
 			} else {
 				return false;
 			}
@@ -550,7 +617,7 @@ abstract class DATA_Model extends CI_Model {
 		if ($limit !== null) {
 			$this->db->limit($offset, $limit);
 		}
-		return $this->get(null, $type,$columns);
+		return $this->get(null, $type, $columns);
 	}
 
 	public function getListOrderBy($order, $limit = null, $offset = null, $type = 'object', $columns = null) {
@@ -558,7 +625,7 @@ abstract class DATA_Model extends CI_Model {
 		if ($limit !== null) {
 			$this->db->limit($offset, $limit);
 		}
-		return $this->get(null,$type,$columns);
+		return $this->get(null, $type, $columns);
 	}
 
 	public function count($where = null) {
@@ -576,18 +643,19 @@ abstract class DATA_Model extends CI_Model {
 		if (count($group)) {
 			$concernedClasses = $this->getExtendedClasses();
 			$models = array($this->getBaseModelName());
-			for($i=1; $i<count($concernedClasses); $i++){
+			for ($i = 1; $i < count($concernedClasses); $i++) {
 				$models[] = strtolower($concernedClasses[$i]);
 			}
 			$lastInsertedId = null;
-			foreach($models as $model){
+			foreach ($models as $model) {
 				$this->loadExtendedInstance($model);
 				$schema = $this->$model->getSchema(false);
 				$subGroup = array();
 				foreach ($group as $datas) {
 					$associatedDatas = array();
-					foreach ($schema as $col){
-						if(array_key_exists($col, $datas))$associatedDatas[$col] = $datas[$col];
+					foreach ($schema as $col) {
+						if (array_key_exists($col, $datas))
+							$associatedDatas[$col] = $datas[$col];
 					}
 					$subGroup[] = $associatedDatas;
 				}
@@ -596,21 +664,21 @@ abstract class DATA_Model extends CI_Model {
 			}
 		}
 	}
-	
+
 	private function insertSubGroup($model, $subGroup, $lastInsertedId) {
 		if (count($subGroup)) {
 			$keys = array_keys($subGroup[0]);
-			if($lastInsertedId !== null){
+			if ($lastInsertedId !== null) {
 				$keys[] = $this->getPrimaryColumns()[0];
 			}
-			
+
 			$this->loadExtendedInstance($model);
 			$values = array();
 			foreach ($subGroup as $datas) {
-				foreach ($datas as $key => $data){
+				foreach ($datas as $key => $data) {
 					$datas[$key] = $this->db->escape($data);
 				}
-				if($lastInsertedId !== null){
+				if ($lastInsertedId !== null) {
 					$datas[$this->getPrimaryColumns()[0]] = $lastInsertedId++;
 				}
 				$values[] = implode(',', $datas);
@@ -626,40 +694,39 @@ abstract class DATA_Model extends CI_Model {
 		if (count($group)) {
 			$concernedClasses = $this->getExtendedClasses();
 			$models = array($this->getBaseModelName());
-			for($i=1; $i<count($concernedClasses); $i++){
+			for ($i = 1; $i < count($concernedClasses); $i++) {
 				$models[] = strtolower($concernedClasses[$i]);
 			}
-			foreach($models as $model){
+			foreach ($models as $model) {
 				$this->loadExtendedInstance($model);
 				$schema = $this->$model->getSchema(false);
 				$subGroup = array();
 				foreach ($group as $datas) {
 					$associatedDatas = array();
-					foreach ($schema as $col){
-						if(array_key_exists($col, $datas))$associatedDatas[$col] = $datas[$col];
+					foreach ($schema as $col) {
+						if (array_key_exists($col, $datas))
+							$associatedDatas[$col] = $datas[$col];
 					}
 					$subGroup[] = $associatedDatas;
 				}
 				$this->updateSubGroup($model, $subGroup);
-				
 			}
 		}
-		
 	}
-	
+
 	private function updateSubGroup($model, $group) {
 		if (count($group)) {
 			$keys = @array_keys(array_shift(array_values($group)));
 			$values = array();
 			foreach ($group as $datas) {
-				foreach ($datas as $key => $data){
+				foreach ($datas as $key => $data) {
 					$datas[$key] = $this->db->escape($data);
 				}
 				$values[] = implode(',', $datas);
 			}
 			$this->loadExtendedInstance($model);
 			$dataColumns = array_diff($keys, $this->$model->getPrimaryColumns());
-			if(!$dataColumns){
+			if (!$dataColumns) {
 				$sql = 'INSERT IGNORE INTO {PRE}' . $this->$model->getTableName() . '(`' . implode('`,`', $keys) . '`) VALUES (' . implode('),(', $values) . ')';
 			} else {
 				$on_duplicate_col = array();
@@ -671,7 +738,6 @@ abstract class DATA_Model extends CI_Model {
 			}
 
 			return $this->db->query($sql);
-		
 		}
 	}
 
@@ -719,7 +785,7 @@ abstract class DATA_Model extends CI_Model {
 	protected function createAliasFrom($str, $update = FALSE) {
 		$str = str_replace('+', 'plus', $str);
 		$str = str_replace('#', 'sharp', $str);
-		$str = str_replace(array('\'','"'), array('-','-'), $str);
+		$str = str_replace(array('\'', '"'), array('-', '-'), $str);
 		$str = htmlentities($str, ENT_NOQUOTES, 'utf-8');
 		$str = preg_replace('#&([A-za-z])(?:acute|cedil|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
 		$str = preg_replace('/\s+/', '_', $str);
@@ -728,7 +794,7 @@ abstract class DATA_Model extends CI_Model {
 		$clean = preg_replace("/[\/_|+ -]+/", '-', $clean);
 		$clean = trim($clean, '-');
 		$alias = strtolower($clean);
-		
+
 		$this->db->from($this->getTableName());
 		$this->db->where('alias', $alias);
 		$count = $this->db->count_all_results();
@@ -739,43 +805,42 @@ abstract class DATA_Model extends CI_Model {
 
 		return $alias;
 	}
-	
-	public function unlink($columns, $datas = null){
-		
-		if($datas === null){
+
+	public function unlink($columns, $datas = null) {
+
+		if ($datas === null) {
 			$datas = $this->toArray();
 		}
-		if($columns && is_string($columns)){
+		if ($columns && is_string($columns)) {
 			$columns = array($columns);
 		}
 		$doUnlink = $columns;
-		foreach ($columns as $column){
+		foreach ($columns as $column) {
 			$doUnlink |= isset($datas[$column]);
 		}
-		if($doUnlink) {
+		if ($doUnlink) {
 			$load = $this->getRow($this->buildPrimaryWhere($datas));
 			foreach ($columns as $column) {
-				if(isset($datas[$column]) && $datas[$column] != $load->{$column}){
+				if (isset($datas[$column]) && $datas[$column] != $load->{$column}) {
 					unlink($load->{$column});
 				}
 			}
 		}
 	}
-	
-	public function getTrough($table, $model, $value, $key = 'id'){
-		$curTable = '{PRE}'.$this->getTableName();
-		$linkTable = '{PRE}'.$table;
+
+	public function getThrough($table, $model, $value, $key = 'id') {
+		$linkTable = '{PRE}' . $table;
+		$db = $this->db;
 		if(is_array($value)){
-			$key = array_keys($value)[0];
-			$value = $value[0];
+			if(!$value) return array();
+			$value = array_map(function($e) use ($db){return $db->escape($e);}, $value);
 		}
-		return $this->get($key.' IN ('
-				. 'SELECT '.  strtolower(get_class($this)).'_'.$key.' '
-				. 'FROM '.$linkTable.' '
-				. 'WHERE '.$model.'_'.$key.' '
-				. '= '. $this->db->escape($value).')');
+		return $this->get($key . ' IN ('
+						. 'SELECT ' . strtolower(get_class($this)) . '_' . $key . ' '
+						. 'FROM ' . $linkTable . ' '
+						. 'WHERE ' . $model . '_' . $key . ' '
+						.(is_array($value) ? 'IN ('.implode(',', $value).')' : '= ' . $this->db->escape($value)).')');
 	}
-	
 
 //	private function hasAlias() {
 //		$schema = $this->getSchema();

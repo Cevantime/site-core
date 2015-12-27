@@ -25,10 +25,13 @@ class Configuration extends DATA_Model {
 	private function initConfigDatas() {
 		$datas = $this->getList();
 		$this->_configDatas = array();
-		foreach ($datas as $value) {
-			$this->_configDatas[$value->key] = $value->value;
+		if($datas){
+			foreach ($datas as $value) {
+				$this->_configDatas[$value->key] = $value->value;
+			}
+			
 		}
-		return $datas;
+		return $this->_configDatas;
 	}
 	
 	private function getConfigDatas() {
@@ -38,8 +41,23 @@ class Configuration extends DATA_Model {
 		return $this->_configDatas;
 	}
 	
-	public function getValues() {
-		return $this->getConfigDatas();
+	public function getValues($cols = null) {
+		$values = $this->getConfigDatas();
+		if($cols){
+			$wantedValues = array();
+			if(!is_array($cols)){
+				$cols = array($cols);
+			}
+			foreach ($cols as $key => $value) {
+				if(is_int($value)){
+					$wantedValues[$value] = isset($values[$value]) ? $values[$value] : null;
+				} else {
+					$wantedValues[$key] = isset($values[$key]) ? $values[$key] : $value;
+				}
+			}
+			return $wantedValues;
+		}
+		return $values;
 	}
 	
 	public function setValues($values){
@@ -63,7 +81,7 @@ class Configuration extends DATA_Model {
 		$this->save($saved);
 	}
 
-	public function getValue($key) {
+	public function getValue($key, $default = null) {
 		if($this->_configDatas){
 			return isset($this->_configDatas[$key]) ? $this->_configDatas[$key] : false;
 		}
@@ -71,7 +89,8 @@ class Configuration extends DATA_Model {
 		if ($row) {
 			return $row->value;
 		}
-		return false;
+		if($default) return $default;
+		return null;
 	}
 
 }
