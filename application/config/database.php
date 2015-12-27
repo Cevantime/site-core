@@ -67,38 +67,5 @@ $db['default']['swap_pre'] = '{PRE}';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
 
-$db['alto']['hostname'] = 'localhost';
-$db['alto']['username'] = 'root';
-$db['alto']['password'] = '';
-$db['alto']['database'] = 'core';
-$db['alto']['dbdriver'] = 'mysqli';
-$db['alto']['dbprefix'] = '';
-$db['alto']['pconnect'] = TRUE;
-$db['alto']['db_debug'] = TRUE;
-$db['alto']['cache_on'] = FALSE;
-$db['alto']['cachedir'] = '';
-$db['alto']['char_set'] = 'utf8';
-$db['alto']['dbcollat'] = 'utf8_general_ci';
-$db['alto']['swap_pre'] = '{PRE}';
-$db['alto']['autoinit'] = TRUE;
-$db['alto']['stricton'] = FALSE;
-
-$db['thibault']['hostname'] = 'localhost';
-$db['thibault']['username'] = 'site-core';
-$db['thibault']['password'] = 'VFZF8P4xjW8c5hHq';
-$db['thibault']['database'] = 'site-core';
-$db['thibault']['dbdriver'] = 'mysqli';
-$db['thibault']['dbprefix'] = '';
-$db['thibault']['pconnect'] = TRUE;
-$db['thibault']['db_debug'] = TRUE;
-$db['thibault']['cache_on'] = FALSE;
-$db['thibault']['cachedir'] = '';
-$db['thibault']['char_set'] = 'utf8';
-$db['thibault']['dbcollat'] = 'utf8_general_ci';
-$db['thibault']['swap_pre'] = '{PRE}';
-$db['thibault']['autoinit'] = TRUE;
-$db['thibault']['stricton'] = FALSE;
-
-
 /* End of file database.php */
 /* Location: ./application/config/database.php */
