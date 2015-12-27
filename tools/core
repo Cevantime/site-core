@@ -1,0 +1,13 @@
+#!/usr/bin/env php
+<?php
+
+require_once 'lib/core/core_cli.php';
+
+
+// take commands
+$cli = new Core_CLI($sources);
+
+$cmd = $argc > 1 ? $argv[1] : null;
+$args = $argc > 2 ? array_slice($argv, 2) : array();
+
+$cli->execute($cmd, $args);
