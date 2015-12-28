@@ -39,7 +39,7 @@ if (!defined('BASEPATH'))
  * @return	string
  */
 if (!function_exists('imageresize')) {
-
+	// very useful
 	function imageresize($src, $width, $height, $crop = true) {
 		$path_request = $src;
 		$remote = true;
