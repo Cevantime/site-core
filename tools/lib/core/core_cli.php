@@ -208,7 +208,6 @@ class Core_CLI {
 
 		$cmd .= 'git clone ' . CORE_SOURCE . ';';
 
-		$cmd .= "git pull origin master";
 		Core_utils::line("executing : $cmd");
 		exec($cmd);
 
