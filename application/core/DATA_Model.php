@@ -490,7 +490,7 @@ abstract class DATA_Model extends CI_Model {
 		if (count($primaryCols) > 1) {
 			// insert on multi primary cols
 			// not supported yet
-			$this->afterInsert($insert_id, $datas);
+			$this->afterInsert($insertedId, $datas);
 			return $insertedId;
 		}
 		$key = $primaryCols[0];
@@ -507,7 +507,7 @@ abstract class DATA_Model extends CI_Model {
 			}
 			$this->db->insert($table, $datasToInsert);
 		}
-		$this->afterInsert($insert_id, $datas);
+		$this->afterInsert($insertedId, $datas);
 		return $insertedId;
 	}
 
