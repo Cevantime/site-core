@@ -88,14 +88,12 @@ class Core_CLI {
 //    }
 
 	private function help() {
-		Core_utils::line('install         # Install a spark');
-		Core_utils::line('reinstall       # Reinstall a spark');
-		Core_utils::line('remove          # Remove a spark');
+		Core_utils::line('install         # Install the core');
+		Core_utils::line('update       # update your app');
 //        Module_utils::line('list            # List installed sparks');
 //        Module_utils::line('search          # Search for a spark');
 		Core_utils::line('sources         # Display the spark source URL(s)');
 //        Module_utils::line('upgrade-system  # Update Sparks Manager to latest version (does not upgrade any of your installed sparks)');
-		Core_utils::line('version         # Display the installed spark version');
 		Core_utils::line('help            # Print This message');
 	}
 
@@ -126,7 +124,8 @@ class Core_CLI {
 	}
 
 	private function install($args) {
-		$name = realpath(__DIR__ . '/../../../');
+		$name = sys_get_temp_dir().'/'.uniqid();
+		$basepath = realpath(__DIR__ . '/../../../');
 		Core_utils::line('installing the module in ' . $name);
 		$cmd = '';
 		$cmd .= "git init $name;";
@@ -143,9 +142,9 @@ class Core_CLI {
 			throw new Core_exception('Ooops. It seems that the core couldn\'t be installed');
 		}
 
-		Core_utils::full_move("$name/site-core", "$name/");
-		Core_utils::remove_full_directory("$name/site-core");
-		Core_utils::remove_full_directory("$name/.git");
+		Core_utils::full_move("$name/site-core", "$basepath/");
+		Core_utils::remove_full_directory($name);
+		Core_utils::remove_full_directory("$basepath/.git");
 		$app_env = Core_utils::scan('Your APPLICATION_ENV (alto/thibault/default) :');
 		//putenv('APPLICATION_ENV=default');
 		Core_utils::sed($name . '/dbchanges/liquibase/update.php', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
@@ -195,9 +194,36 @@ class Core_CLI {
 				Core_utils::error(  $e->getMessage() );
 			}
 
-			$conn = null;
 		}
 		Core_utils::notice('Installation completed - You\'re on fire!');
+	}
+	
+	private function update($args) {
+		$name = sys_get_temp_dir().'/'.uniqid();
+		$basepath = realpath(__DIR__ . '/../../../');
+		Core_utils::line('installing the module in ' . $name);
+		$cmd = '';
+		$cmd .= "git init $name;";
+		$cmd = "cd $name;";
+
+		$cmd .= 'git clone ' . CORE_SOURCE . ';';
+
+		$cmd .= "git pull origin master";
+		Core_utils::line("executing : $cmd");
+		exec($cmd);
+
+
+		if (!file_exists("$name/site-core/application")) {
+			throw new Core_exception('Ooops. It seems that the core couldn\'t be installed');
+		}
+
+		Core_utils::full_move("$name/site-core/system", "$basepath/system");
+		Core_utils::full_move("$name/site-core/application/core", "$basepath/application/core");
+		Core_utils::full_move("$name/site-core/application/helpers", "$basepath/application/helpers");
+		Core_utils::full_move("$name/site-core/application/models", "$basepath/application/models");
+		Core_utils::remove_full_directory($name);
+		
+		Core_utils::notice('Update successfull - You\'re on fire!');
 	}
 
 	/**
