@@ -84,7 +84,7 @@ class Configuration extends DATA_Model {
 	public function getValue($key, $default = null) {
 		$configDatas = $this->getConfigDatas();
 		
-		return isset($configDatas[$key]) ? $configDatas[$key] : $default ? $default : false; 
+		return isset($configDatas[$key]) ? $configDatas[$key] : ($default ? $default : false); 
 	}
 
 }
