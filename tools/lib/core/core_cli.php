@@ -129,7 +129,7 @@ class Core_CLI {
 		Core_utils::line('installing the module in ' . $name);
 		$cmd = '';
 		$cmd .= "git init $name;";
-		$cmd = "cd $name;";
+		$cmd .= "cd $name;";
 
 		$cmd .= 'git clone ' . CORE_SOURCE . ';';
 
@@ -205,7 +205,7 @@ class Core_CLI {
 		Core_utils::line('installing the module in ' . $name);
 		$cmd = '';
 		$cmd .= "git init $name;";
-		$cmd = "cd $name;";
+		$cmd .= "cd $name;";
 
 		$cmd .= 'git clone ' . CORE_SOURCE . ';';
 

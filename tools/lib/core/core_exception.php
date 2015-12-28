@@ -1,5 +1,5 @@
 <?php
 
-class Module_exception extends Exception {
+class Core_exception extends Exception {
 
 }
