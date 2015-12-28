@@ -189,6 +189,7 @@ class Core_CLI {
 					}
 					file_put_contents("$name/application/config/database.php", $database_ci_config.$toAppend);
 				}
+				Core_utils::line('...running liquibase...');
 				`php dbchanges/liquibase/update.php`;
 			} catch (PDOException $e) {
 				Core_utils::error(  $e->getMessage() );
