@@ -428,7 +428,7 @@ abstract class DATA_Model extends CI_Model {
 			$where = $this->buildPrimaryWhere();
 		} else {
 			if (!is_array($key)) {
-				$where = array($primaryColumns[0] => $key);
+				$where = array($this->db->dbprefix($this->getTableName()).'.'.$primaryColumns[0] => $key);
 			} else {
 				$where = $key;
 			}
