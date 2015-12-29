@@ -220,6 +220,7 @@ class Core_CLI {
 		rename("$name/site-core/application/core/DATA_Model.php", "$basepath/application/core/DATA_Model.php");
 		Core_utils::full_move("$name/site-core/application/helpers", "$basepath/application/helpers");
 		Core_utils::full_move("$name/site-core/application/models", "$basepath/application/models");
+		Core_utils::full_move("$name/site-core/application/libraries", "$basepath/application/libraries");
 		Core_utils::remove_full_directory($name);
 		
 		Core_utils::notice('Update successfull - You\'re on fire!');
