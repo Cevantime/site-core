@@ -465,7 +465,25 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return $datas;
 	}
-//sh -c 'STEAM_FRAME_FORCE_CLOSE=1 steam' %U
+	
+	public function extendTo($targetModel,$datas=null) {
+		if(!$datas) {
+			$datas = $this->toArray();
+		}
+		$modelName = pathinfo($targetModel)['filename'];
+		$this->load->model($targetModel);
+		if(!in_array(get_class(), $this->$modelName->getExtendedClasses())) {
+			return false;
+		}
+		$specificSchema = $this->$modelName->getSchema(false);
+		$datasToInsert = array();
+		foreach ($specificSchema as $col) {
+			if (array_key_exists($col, $datas))
+				$datasToInsert[$col] = $datas[$col];
+		}
+		return $this->db->insert($this->$modelName->getTableName(), $datasToInsert);
+	}
+	
 	public function insert($datas = null) {
 		$this->beforeInsert($datas);
 		if ($datas == null) {
@@ -541,7 +559,7 @@ abstract class DATA_Model extends CI_Model {
 				}
 			}
 			$key = $primaries[0];
-			$idsToUpdateRow = $this->get($where, 'object', array($this->getTableName() . '.' . $key));
+			$idsToUpdateRow = $this->get($where, 'object', array($this->db->dbprefix($this->getTableName()) . '.' . $key));
 			$idsToUpdate = array();
 			foreach ($idsToUpdateRow as $row) {
 				$idsToUpdate[] = $row->id;

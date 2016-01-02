@@ -126,15 +126,20 @@ class BBCodeParser extends JBBCode\Parser {
 		
 		$builder = new JBBCode\CodeDefinitionBuilder('tr', '<tr>{param}</tr>');
 		$this->addCodeDefinition($builder->build());
+		
+		$builder = new JBBCode\CodeDefinitionBuilder('br', '<br/>');
+		$this->addCodeDefinition($builder->build());
 	}
 
 	public function parse($str) {
 		$str = str_replace("\t", "    ", $str);
+		$str = str_replace("\r\n", '[br][/br]', $str);
 		$str = html_escape($str);
 		parent::parse($str);
 		$treeRoot = &$this->treeRoot;
 		$i = 0;
-		$children = &$treeRoot->getChildren();
+		$chren = $treeRoot->getChildren();
+		$children = &$chren;
 		foreach ($children as &$child) {
 			if ($child instanceof \JBBCode\ElementNode && $child->getTagName() == 'section1') {
 				$child->setAttribute('tuto-section-' . $i++);

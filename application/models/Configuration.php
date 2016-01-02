@@ -15,7 +15,7 @@ class Configuration extends DATA_Model {
 	private $_configDatas;
 
 	public function getTableName() {
-		return 'configuration';
+		return 'configurations';
 	}
 
 	public function getPrimaryColumns() {
