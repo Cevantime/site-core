@@ -198,7 +198,6 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	protected function prepareSearch($limit = null, $offset = null, $search = null, $columns = null) {
-		$this->makeExtendedJoins();
 		if ($columns === null && !$this->getData('columns')) {
 			$columns = $this->getDataColumns();
 		} else if ($columns === null) {
