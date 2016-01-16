@@ -81,6 +81,26 @@ class Modules {
 
 		log_message('error', "Module controller failed to run: {$module}/{$method}");
 	}
+	
+	public static function execute($module) {
+		$method = 'index';
+
+		if (($pos = strrpos($module, '/')) != FALSE) {
+			$method = substr($module, $pos + 1);
+			$module = substr($module, 0, $pos);
+		}
+
+		if ($class = self::load($module)) {
+			if (method_exists($class, $method)) {
+				
+				$args = func_get_args();
+				$output = call_user_func_array(array($class, $method), array_slice($args, 1));
+				return $output;
+			}
+		}
+
+		log_message('error', "Module controller failed to run: {$module}/{$method}");
+	}
 
 	/** Load a module controller * */
 	public static function load($module) {
