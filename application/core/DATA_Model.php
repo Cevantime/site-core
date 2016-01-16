@@ -663,15 +663,13 @@ abstract class DATA_Model extends CI_Model {
 		return $this->get(null, $type, $columns);
 	}
 
-	public function getListOrderBy($order = null, $limit = null, $offset = null, $type = 'object', $columns = null) {
+	public function getListOrderBy($limit = null, $offset = null, $type = 'object', $columns = null,$order = null) {
 		if(!$order) {
 			$order = $this->getData('order');
 		}
 		$this->db->order_by($order);
-		if ($limit !== null) {
-			$this->db->limit($offset, $limit);
-		}
-		return $this->get(null, $type, $columns);
+		
+		return $this->getList($limit, $offset, $type, $columns);
 	}
 
 	public function count($where = null) {
