@@ -353,6 +353,7 @@ abstract class DATA_Model extends CI_Model {
 			return $this->db->get_compiled_select();
 		}
 		$query = $this->db->get();
+		$this->clear();
 		if ($query->num_rows()) {
 			return $query->result($type);
 		}
@@ -662,7 +663,10 @@ abstract class DATA_Model extends CI_Model {
 		return $this->get(null, $type, $columns);
 	}
 
-	public function getListOrderBy($order, $limit = null, $offset = null, $type = 'object', $columns = null) {
+	public function getListOrderBy($order = null, $limit = null, $offset = null, $type = 'object', $columns = null) {
+		if(!$order) {
+			$order = $this->getData('order');
+		}
 		$this->db->order_by($order);
 		if ($limit !== null) {
 			$this->db->limit($offset, $limit);
