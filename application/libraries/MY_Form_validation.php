@@ -1218,7 +1218,7 @@ class MY_Form_validation extends CI_Form_validation
 	 * @return boolean
 	 */
 	public function valid_french_zip($zip) {
-		return preg_match('#^(2[ab]|0[1-9]|[1-9][0-9])[0-9]{3}$#', $zip);
+		return preg_match('#^(2[ab]|0[1-9]|[1-9][0-9])[0-9]{3}$#', $zip) === 1;
 	}
 }
 /* End of file MY_form_validation.php */
