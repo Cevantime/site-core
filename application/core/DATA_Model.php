@@ -211,10 +211,12 @@ abstract class DATA_Model extends CI_Model {
 		if ($limit !== null) {
 			$this->db->limit($offset, $limit);
 		}
-
+		$this->db->group_start();
 		foreach ($columns as $col) {
 			$this->db->or_like($col, $search);
 		}
+		$this->db->group_end();
+	
 	}
 
 	protected function getDataColumns() {
