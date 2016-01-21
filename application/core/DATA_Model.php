@@ -579,6 +579,7 @@ abstract class DATA_Model extends CI_Model {
 			for ($i = 1; $i < $nbExtendingTables; $i++) {
 				$table = $extendingTables[$i];
 				$model = strtolower($extendingClasses[$i]);
+				$this->loadExtendedInstance($model);
 				$cols = $this->$model->getSchema(false);
 				$datasToUpdate = array();
 				foreach ($cols as $col) {
