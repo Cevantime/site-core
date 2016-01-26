@@ -108,6 +108,7 @@ class MX_Router extends CI_Router
 	/** Locate the controller **/
 	public function locate($segments)
 	{
+		$this->directory = false;
 		$this->located = 0;
 		$ext = $this->config->item('controller_suffix').EXT;
 		/* use module route if available */
@@ -117,7 +118,6 @@ class MX_Router extends CI_Router
 		}
 		/* get the segments array elements */
 		list($module, $directory, $controller) = array_pad($segments, 3, NULL);
-
 		/* check modules */
 		foreach (Modules::$locations as $location => $offset)
 		{
@@ -164,7 +164,6 @@ class MX_Router extends CI_Router
 				}
 			}
 		}
-
 		if( ! empty($this->directory) && $this->located !== -1) return;
 		$this->located = 0;
 		/* application sub-directory controller exists? */
@@ -186,7 +185,7 @@ class MX_Router extends CI_Router
 				}
 			}
 		}
-
+		
 		/* application controllers sub-directory exists? */
 		if (is_dir(APPPATH.'controllers/'.$module.'/'))
 		{
