@@ -36,7 +36,7 @@ abstract class DATA_Model extends CI_Model {
 				$this->_extendedSchema = array();
 				$tables = $this->getExtendedTables();
 				foreach ($tables as $table) {
-					$fields = $this->db->list_fields($table);
+					$fields = $this->db->list_fields($this->db->dbprefix($table));
 					$cols = array();
 					foreach ($fields as $field) {
 						$cols[$table . '.' . $field] = $field;
@@ -50,7 +50,7 @@ abstract class DATA_Model extends CI_Model {
 			if ($this->_schema === null) {
 				$this->_schema = array();
 				$table = $this->getTableName();
-				$fields = $this->db->list_fields($table);
+				$fields = $this->db->list_fields($this->db->dbprefix($table));
 				$cols = array();
 				foreach ($fields as $field) {
 					$cols[] = $field;
@@ -571,7 +571,6 @@ abstract class DATA_Model extends CI_Model {
 			if ($datasToUpdate) {
 				$this->db->where_in($key, $idsToUpdate);
 				$ret = $this->db->update($baseTable, $datasToUpdate);
-				
 			}
 			$extendingTables = $this->getExtendedTables();
 			$nbExtendingTables = count($extendingTables);
@@ -875,8 +874,8 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function getThrough($table, $model, $value, $key = 'id') {
-		$linkTable = '{PRE}' . $table;
 		$db = $this->db;
+		$linkTable = $db->dbprefix($table);
 		if(is_array($value)){
 			if(!$value) return array();
 			$value = array_map(function($e) use ($db){return $db->escape($e);}, $value);
