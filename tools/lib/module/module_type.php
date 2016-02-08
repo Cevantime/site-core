@@ -58,13 +58,23 @@ class Module_type {
 			unlink($this->installation_path.'/prebuild.php');
 		}
 		
-		if(file_exists($this->installation_path.'/dbchanges.sql')){
+		if(file_exists($this->installation_path.'/dbchanges')){
 			Module_utils::line('installing dbchanges');
-			$dbchangesPath = $this->installation_path.'/dbchanges.sql';
-			$changeToAppend = file_get_contents($dbchangesPath)."\n";
-			
+			$dbchangesPath = $this->installation_path.'/dbchanges';
+			$changeToAppend = '';
+			$files = Module_utils::list_files($dbchangesPath);
 			$changeLogTargetPath = $dbchanges_path = MODULE_PATH.'/../../dbchanges/liquibase/changeLog.sql';
 			$changeLogTargetContent = file_get_contents($changeLogTargetPath);
+			foreach($files as $file){
+				$module['map']['dbchanges'][] = $file;
+				$filename = basename($file,'.sql');
+				$prefix = "--changeset module:install_{$this->name}_$filename\n";
+				if(strpos($changeLogTargetContent, $prefix) !== false){
+					continue;
+				}
+				$suffix = "\n";
+				$changeToAppend .= $prefix.file_get_contents($dbchangesPath.'/'.$file).$suffix;
+			}
 			$changeToAppend = $changeLogTargetContent . $changeToAppend;
 			file_put_contents($changeLogTargetPath, $changeToAppend);
 			
