@@ -75,7 +75,7 @@ class Module_type {
 				$suffix = "\n";
 				$changeToAppend .= $prefix.file_get_contents($dbchangesPath.'/'.$file).$suffix;
 			}
-			$changeToAppend = $changeLogTargetContent . $changeToAppend;
+			$changeToAppend = $changeLogTargetContent ."\n". $changeToAppend;
 			file_put_contents($changeLogTargetPath, $changeToAppend);
 			
 			`php dbchanges/liquibase/update.php`;
