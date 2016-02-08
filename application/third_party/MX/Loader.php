@@ -382,14 +382,30 @@ class MX_Loader extends CI_Loader
 		extract($this->_ci_cached_vars);
 
 		ob_start();
-
-		if ((bool) @ini_get('short_open_tag') === FALSE && CI::$APP->config->item('rewrite_short_tags') == TRUE)
+		
+		if(is_module_installed('traductions'))
 		{
-			echo eval('?>'.preg_replace("/;*\s*\?>/", "; ?>", str_replace('<?=', '<?php echo ', file_get_contents($_ci_path))));
+			$abs_ci_path = realpath($_ci_path);
+			$this->helper('locale');
+			$this->library('traductions/traductor');
+			$traductor = CI::$APP->traductor;
+			$file_contents = $traductor->getFileTrad($abs_ci_path);
+			if ((bool) @ini_get('short_open_tag') === FALSE && CI::$APP->config->item('rewrite_short_tags') == TRUE)
+			{
+				$file_contents = eval('?>'.preg_replace("/;*\s*\?>/", "; ?>", str_replace('<?=', '<?php echo ', $file_contents)));
+			}
+			echo $file_contents;
 		}
 		else
 		{
-			include($_ci_path);
+			if ((bool) @ini_get('short_open_tag') === FALSE && CI::$APP->config->item('rewrite_short_tags') == TRUE)
+			{
+				echo eval('?>'.preg_replace("/;*\s*\?>/", "; ?>", str_replace('<?=', '<?php echo ', file_get_contents($_ci_path))));
+			}
+			else
+			{
+				include($_ci_path);
+			}
 		}
 
 		log_message('debug', 'File loaded: '.$_ci_path);
