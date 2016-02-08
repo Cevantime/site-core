@@ -58,7 +58,7 @@ class Module_type {
 			unlink($this->installation_path.'/prebuild.php');
 		}
 		
-		if(file_exists($this->installation_path.'/dbchanges')){
+		if(file_exists($this->installation_path.'/dbchanges.sql')){
 			Module_utils::line('installing dbchanges');
 			$dbchangesPath = $this->installation_path.'/dbchanges.sql';
 			$changeToAppend = file_get_contents($dbchangesPath)."\n";
