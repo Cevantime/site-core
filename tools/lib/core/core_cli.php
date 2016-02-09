@@ -146,7 +146,7 @@ class Core_CLI {
 		Core_utils::remove_full_directory("$basepath/.git");
 		$app_env = Core_utils::scan('Your APPLICATION_ENV (alto/thibault/default) :');
 		//putenv('APPLICATION_ENV=default');
-		Core_utils::sed($name . '/dbchanges/liquibase/update.php', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
+		Core_utils::sed($basepath . '/dbchanges/liquibase/update.php', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
 		$database = Core_utils::scan('Should your app have a database (Y/n) :');
 		$database = strtolower($database);
 		if (!$database OR $database === 'y') {
@@ -172,7 +172,7 @@ class Core_CLI {
 				OR Core_utils::error(print_r($dbh->errorInfo(), true));
 				if($app_env != 'default') {
 					Core_utils::line('The database has been successfully created. Copying config...');
-					$database_ci_config = file_get_contents("$name/application/config/database.php");
+					$database_ci_config = file_get_contents("$basepath/application/config/database.php");
 					//$db['default']['dbdriver'] = 'mysqli';
 					preg_match_all('#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#', $database_ci_config, $matches);
 					$toAppend = "\n";
@@ -186,7 +186,7 @@ class Core_CLI {
 						}
 						$toAppend .= "$match\n";
 					}
-					file_put_contents("$name/application/config/database.php", $database_ci_config.$toAppend);
+					file_put_contents("$basepath/application/config/database.php", $database_ci_config.$toAppend);
 				}
 				Core_utils::line('...running liquibase...');
 				`php dbchanges/liquibase/update.php`;
