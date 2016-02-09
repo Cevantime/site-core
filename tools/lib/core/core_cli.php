@@ -178,10 +178,31 @@ class Core_CLI {
 					$toAppend = "\n";
 					$matches = $matches[0];
 					foreach ($matches as $match) {
-						foreach (array('hostname','username','password','database') as $prop){
-							$pattern = '#\$db.*?\[\'default\'\].*?\[\''.$prop.'\'?\].*?=.*?;#';
+						foreach (
+								array(
+									'hostname',
+									'username',
+									'password',
+									'database',
+									'dbdriver',
+									'dbprefix',
+									'pconnect',
+									'db_debug',
+									'cache_on',
+									'cachedir',
+									'char_set',
+									'dbcollat',
+									'swap_pre',
+									'autoinit',
+									'stricton'
+								) as $prop){
+							$pattern = '#\$db.*?\[\'default\'\].*?\[\''.$prop.'\'?\].*?=(.*)?;#';
 							if(preg_match($pattern, $match)){
-								$match = preg_replace($pattern, "\$db['$app_env']['$prop'] = '".${'database_'.$prop}."';", $match);
+								if(isset(${'database_'.$prop})){
+									$match = preg_replace($pattern, "\$db['$app_env']['$prop'] = '".${'database_'.$prop}."';", $match);
+								} else {
+									$match = preg_replace($pattern, "\$db['$app_env']['$prop'] = $1;", $match);
+								}
 							}
 						}
 						$toAppend .= "$match\n";
