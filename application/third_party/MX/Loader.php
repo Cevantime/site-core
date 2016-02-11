@@ -389,7 +389,7 @@ class MX_Loader extends CI_Loader
 			$this->helper('locale');
 			$this->library('traductions/traductor');
 			$traductor = CI::$APP->traductor;
-			$file_contents = $traductor->getFileTrad($abs_ci_path);
+			$file_contents = $traductor->getFileTrad($abs_ci_path, locale());
 //			if ((bool) @ini_get('short_open_tag') === FALSE && CI::$APP->config->item('rewrite_short_tags') == TRUE)
 //			{
 				$file_contents = eval('?>'.preg_replace("/;*\s*\?>/", "; ?>", str_replace('<?=', '<?php echo ', $file_contents)));
