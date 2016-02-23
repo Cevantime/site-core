@@ -327,8 +327,11 @@ abstract class DATA_Model extends CI_Model {
 					$this->doUpload($datas, $uploadPath, $key);
 				}
 			} else {
-				$uploadPath = $uploadPaths;
-				$this->doUpload($datas, $uploadPath, $key);
+				foreach ($files as $key => $filedata) {
+					$uploadPath = $uploadPaths;
+					$this->doUpload($datas, $uploadPath, $key);
+				}
+				
 			}
 		}
 		if ($datas) {
@@ -337,15 +340,16 @@ abstract class DATA_Model extends CI_Model {
 		return $this->save($this->filterInvalidFields($_POST));
 	}
 	
-	private function doUpload($datas, $uploadPath, $key) {
+	private function doUpload(&$datas, $uploadPath, $key) {
 		$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
 		if ($this->upload->do_upload($key)) {
 			if ($datas) {
-				$datas[$key] = $uploadPath . '/' . $this->_ci_upload->file_name;
+				$datas[$key] = $uploadPath . '/' . $this->upload->file_name;
 			} else {
-				$_POST[$key] = $uploadPath . '/' . $this->_ci_upload->file_name;
+				$_POST[$key] = $uploadPath . '/' . $this->upload->file_name;
 			}
 		}
+		
 	}
 	
 	public function get($where = null, $type = 'object', $columns = null) {
