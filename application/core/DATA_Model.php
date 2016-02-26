@@ -75,7 +75,7 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return $this->_extendedClasses;
 	}
-	
+
 	public function compileQueryOnly($compile) {
 		$this->_compileQueryOnly = $compile;
 	}
@@ -130,19 +130,19 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return null;
 	}
-	
+
 	protected function beforeInsert($to_insert = null) {
 		
 	}
-	
+
 	protected function afterInsert($insert_id, $to_insert = null) {
 		
 	}
-	
-	protected function beforeUpdate($datas = null, $where= null) {
+
+	protected function beforeUpdate($datas = null, $where = null) {
 		
 	}
-	
+
 	protected function afterUpdate($datas = null, $where = null) {
 		
 	}
@@ -158,25 +158,25 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	protected function makeExtendedJoins() {
-		if (!$this->isExtendingModel()) {
-			return;
+		if ($this->isExtendingModel()) {
+			$extendingTables = $this->getExtendedTables();
+			$baseTable = $extendingTables[0];
+			$baseModel = $this->getBaseModelName();
+			$this->loadExtendedInstance($baseModel);
+			$primaryColumns = $this->$baseModel->getPrimaryColumns();
+			if (count($primaryColumns) > 1) {
+				//multi primary column link
+				// not supported yet
+				return;
+			}
+			$key = $primaryColumns[0];
+			$this->db->join($baseTable, $this->db->dbprefix($baseTable) . '.' . $key . ' = ' . $this->getTableName() . '.' . $key, 'left');
+			for ($i = 1; $i < count($extendingTables) - 1; $i++) {
+				$table = $extendingTables[$i];
+				$this->db->join($table, $this->db->dbprefix($table) . '.' . $key . ' = ' . $this->getTableName() . '.' . $key, 'left');
+			}
 		}
-		$extendingTables = $this->getExtendedTables();
-		$baseTable = $extendingTables[0];
-		$baseModel = $this->getBaseModelName();
-		$this->loadExtendedInstance($baseModel);
-		$primaryColumns = $this->$baseModel->getPrimaryColumns();
-		if (count($primaryColumns) > 1) {
-			//multi primary column link
-			// not supported yet
-			return;
-		}
-		$key = $primaryColumns[0];
-		$this->db->join($baseTable, $this->db->dbprefix($baseTable) . '.' . $key . ' = ' . $this->getTableName() . '.' . $key, 'left');
-		for ($i = 1; $i < count($extendingTables) - 1; $i++) {
-			$table = $extendingTables[$i];
-			$this->db->join($table, $this->db->dbprefix($table) . '.' . $key . ' = ' . $this->getTableName() . '.' . $key, 'left');
-		}
+
 		if ($this->_joins) {
 			foreach ($this->_joins as $join) {
 				$this->db->join($join['table'], $join['cond'], $join['type'], $join['escape']);
@@ -216,7 +216,6 @@ abstract class DATA_Model extends CI_Model {
 			$this->db->or_like($col, $search);
 		}
 		$this->db->group_end();
-	
 	}
 
 	protected function getDataColumns() {
@@ -301,7 +300,7 @@ abstract class DATA_Model extends CI_Model {
 		$primaries = $this->getPrimaryColumns();
 		$isUpdate = true;
 		$input = $datas ? $datas : $_POST;
-		
+
 		foreach ($primaries as $primary) {
 			if (!isset($input[$primary])) {
 				$isUpdate = false;
@@ -331,7 +330,6 @@ abstract class DATA_Model extends CI_Model {
 					$uploadPath = $uploadPaths;
 					$this->doUpload($datas, $uploadPath, $key);
 				}
-				
 			}
 		}
 		if ($datas) {
@@ -339,7 +337,7 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return $this->save($this->filterInvalidFields($_POST));
 	}
-	
+
 	private function doUpload(&$datas, $uploadPath, $key) {
 		$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
 		if ($this->upload->do_upload($key)) {
@@ -349,12 +347,11 @@ abstract class DATA_Model extends CI_Model {
 				$_POST[$key] = $uploadPath . '/' . $this->upload->file_name;
 			}
 		}
-		
 	}
-	
+
 	public function get($where = null, $type = 'object', $columns = null) {
 		$this->prepareGet($where, $type, $columns);
-		if($this->_compileQueryOnly){
+		if ($this->_compileQueryOnly) {
 			return $this->db->get_compiled_select();
 		}
 		$query = $this->db->get();
@@ -364,8 +361,8 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return false;
 	}
-	
-	public function prepareGet($where = array(), $type = 'object', $columns = null){
+
+	public function prepareGet($where = array(), $type = 'object', $columns = null) {
 		$this->makeExtendedJoins();
 		if ($columns !== null) {
 			$this->db->select($columns);
@@ -385,7 +382,7 @@ abstract class DATA_Model extends CI_Model {
 
 	public function getRow($where = array(), $type = 'object', $columns = null) {
 		$this->prepareGet($where, $type, $columns);
-		
+
 		$this->db->limit(1);
 
 		$query = $this->db->get();
@@ -434,7 +431,7 @@ abstract class DATA_Model extends CI_Model {
 			$where = $this->buildPrimaryWhere();
 		} else {
 			if (!is_array($key)) {
-				$where = array($this->db->dbprefix($this->getTableName()).'.'.$primaryColumns[0] => $key);
+				$where = array($this->db->dbprefix($this->getTableName()) . '.' . $primaryColumns[0] => $key);
 			} else {
 				$where = $key;
 			}
@@ -461,24 +458,24 @@ abstract class DATA_Model extends CI_Model {
 	public function __set($name, $value) {
 		$this->_datas[$this->getTableName() . '.' . $name] = $value;
 	}
-	
+
 	public function filterInvalidFields(&$datas) {
 		$schema = $this->getSchema();
-		foreach ($datas as $key => $data){
-			if(empty($data) || !in_array($key, $schema)){
+		foreach ($datas as $key => $data) {
+			if (empty($data) || !in_array($key, $schema)) {
 				unset($datas[$key]);
 			}
 		}
 		return $datas;
 	}
-	
-	public function extendTo($targetModel,$datas=null) {
-		if(!$datas) {
+
+	public function extendTo($targetModel, $datas = null) {
+		if (!$datas) {
 			$datas = $this->toArray();
 		}
 		$modelName = pathinfo($targetModel)['filename'];
 		$this->load->model($targetModel);
-		if(!in_array(get_class(), $this->$modelName->getExtendedClasses())) {
+		if (!in_array(get_class(), $this->$modelName->getExtendedClasses())) {
 			return false;
 		}
 		$specificSchema = $this->$modelName->getSchema(false);
@@ -489,7 +486,7 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return $this->db->insert($this->$modelName->getTableName(), $datasToInsert);
 	}
-	
+
 	public function insert($datas = null) {
 		$this->beforeInsert($datas);
 		if ($datas == null) {
@@ -668,12 +665,12 @@ abstract class DATA_Model extends CI_Model {
 		return $this->get(null, $type, $columns);
 	}
 
-	public function getListOrderBy($limit = null, $offset = null, $type = 'object', $columns = null,$order = null) {
-		if(!$order) {
+	public function getListOrderBy($limit = null, $offset = null, $type = 'object', $columns = null, $order = null) {
+		if (!$order) {
 			$order = $this->getData('order');
 		}
 		$this->db->order_by($order);
-		
+
 		return $this->getList($limit, $offset, $type, $columns);
 	}
 
@@ -880,15 +877,18 @@ abstract class DATA_Model extends CI_Model {
 	public function getThrough($table, $model, $value, $key = 'id') {
 		$db = $this->db;
 		$linkTable = $db->dbprefix($table);
-		if(is_array($value)){
-			if(!$value) return array();
-			$value = array_map(function($e) use ($db){return $db->escape($e);}, $value);
+		if (is_array($value)) {
+			if (!$value)
+				return array();
+			$value = array_map(function($e) use ($db) {
+				return $db->escape($e);
+			}, $value);
 		}
 		return $this->get($key . ' IN ('
 						. 'SELECT ' . strtolower(get_class($this)) . '_' . $key . ' '
 						. 'FROM ' . $linkTable . ' '
 						. 'WHERE ' . $model . '_' . $key . ' '
-						.(is_array($value) ? 'IN ('.implode(',', $value).')' : '= ' . $this->db->escape($value)).')');
+						. (is_array($value) ? 'IN (' . implode(',', $value) . ')' : '= ' . $this->db->escape($value)) . ')');
 	}
 
 //	private function hasAlias() {
