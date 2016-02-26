@@ -131,19 +131,19 @@ abstract class DATA_Model extends CI_Model {
 		return null;
 	}
 
-	protected function beforeInsert($to_insert = null) {
+	protected function beforeInsert(&$to_insert = null) {
 		
 	}
 
-	protected function afterInsert($insert_id, $to_insert = null) {
+	protected function afterInsert($insert_id, &$to_insert = null) {
 		
 	}
 
-	protected function beforeUpdate($datas = null, $where = null) {
+	protected function beforeUpdate(&$datas = null, $where = null) {
 		
 	}
 
-	protected function afterUpdate($datas = null, $where = null) {
+	protected function afterUpdate(&$datas = null, $where = null) {
 		
 	}
 
@@ -488,11 +488,11 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function insert($datas = null) {
-		$this->beforeInsert($datas);
 		if ($datas == null) {
 			$datas = $this->toArray();
 			$this->clear();
 		}
+		$this->beforeInsert($datas);
 		$this->convertArrayColumnsToJson($datas);
 		$baseModel = $this->getBaseModelName();
 		$this->loadExtendedInstance($baseModel);
@@ -533,11 +533,11 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function update($datas = null, $where = null) {
-		$this->beforeUpdate($datas, $where);
 		if ($datas == null) {
 			$datas = $this->toArray();
 			$this->clear();
 		}
+		$this->beforeUpdate($datas, $where);
 		$this->convertArrayColumnsToJson($datas);
 		$primaries = $this->getPrimaryColumns();
 		if ($where === null) {
