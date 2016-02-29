@@ -612,7 +612,7 @@ abstract class DATA_Model extends CI_Model {
 		}
 		$this->convertArrayColumnsToJson($datas);
 		if ($this->updateDatas($datas)) {
-			return $this->update($datas);
+			return $this->update($datas, $where);
 		} else {
 			return $this->insert($datas);
 		}

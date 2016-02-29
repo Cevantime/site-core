@@ -383,7 +383,7 @@ class MX_Loader extends CI_Loader
 
 		ob_start();
 		
-		if(is_module_installed('traductions'))
+		if(is_module_installed('traductions') && ENVIRONMENT !== 'development')
 		{
 			$abs_ci_path = realpath($_ci_path);
 			$this->helper('locale');
