@@ -16,6 +16,7 @@ abstract class DATA_Model extends CI_Model {
 	protected $_schema;
 	protected $_extendedSchema;
 	protected $_modelName;
+	protected $_lastValidationErrors;
 	protected $_extendedTables;
 	protected $_extendedClasses;
 	protected $_extendedInstances;
@@ -297,6 +298,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function fromDatas($datas = null) {
+		$this->resetErrors();
 		$primaries = $this->getPrimaryColumns();
 		$isUpdate = true;
 		$input = $datas ? $datas : $_POST;
@@ -314,6 +316,7 @@ abstract class DATA_Model extends CI_Model {
 		}
 		$this->form_validation->set_rules($rules);
 		if (!$this->form_validation->run()) {
+			$this->addErrors($this->form_validation->error_array());
 			return false;
 		}
 		$uploadPaths = $this->uploadPaths();
@@ -332,12 +335,15 @@ abstract class DATA_Model extends CI_Model {
 				}
 			}
 		}
+		
+		$this->addErrors($this->upload->error_msg);
+		
 		if ($datas) {
 			return $this->save($this->filterInvalidFields($datas));
 		}
 		return $this->save($this->filterInvalidFields($_POST));
 	}
-
+	
 	private function doUpload(&$datas, $uploadPath, $key) {
 		$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
 		if ($this->upload->do_upload($key)) {
@@ -347,6 +353,22 @@ abstract class DATA_Model extends CI_Model {
 				$_POST[$key] = $uploadPath . '/' . $this->upload->file_name;
 			}
 		}
+	}
+	
+	public function getLastErrors() {
+		return $this->_lastValidationErrors;
+	}
+	
+	public function getLastErrorsString($open= '<p>',$close = '</p>') {
+		return $open.implode($close.$open, $this->_lastValidationErrors).$close;
+	}
+	
+	private function addErrors($errors) {
+		$this->_lastValidationErrors = array_merge($this->_lastValidationErrors,$errors);
+	}
+	
+	private function resetErrors() {
+		$this->_lastValidationErrors = array();
 	}
 
 	public function get($where = null, $type = 'object', $columns = null) {
