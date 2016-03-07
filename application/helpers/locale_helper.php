@@ -19,24 +19,21 @@ if (!defined('BASEPATH'))
 
 if (!function_exists('locale')) {
 	function locale($loc = null) {
-		return 'fr';
-//		$CI =& get_instance();
-//		$CI->load->library('session');
-//		if($loc){
-//			if(strpos($loc, 'fr') !== FALSE){
-//				$loc = 'fr';
-//			}
-//			else {
-//				$loc = 'en';
-//			}
-//			$CI->session->set_userdata('user_loc', $loc);
-//		}
-//		else if($CI->session->userdata('user_loc')){
-//			return $CI->session->userdata('user_loc');
-//		}
-//		else if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
-//			locale($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-//			return locale();
-//		}
+		$CI =& get_instance();
+		$CI->load->library('session');
+		if($loc){
+			$loc = strtolower(substr($loc, 0,2));
+			$CI->session->set_userdata('user_loc', $loc);
+		}
+		else if($CI->session->userdata('user_loc')){
+			return $CI->session->userdata('user_loc');
+		}
+		else if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
+			locale($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+			return locale();
+		} else {
+			locale('fr');
+			return locale();
+		}
 	}
 }

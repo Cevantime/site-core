@@ -49,6 +49,21 @@ class Core_utils {
         }
         closedir($dir);
     }
+	
+	
+	
+	static function list_files_and_directories($dir)
+	{
+		$scan = scandir($dir);
+		$files = array();
+		foreach($scan as $file){
+			if($file === '..' || $file === '.'){
+				continue;
+			}
+			$files[] = $file;
+		}
+		return $files;
+	}
 
     static function remove_full_directory($dir, $vocally = false)
     {

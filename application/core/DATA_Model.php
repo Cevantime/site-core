@@ -16,7 +16,6 @@ abstract class DATA_Model extends CI_Model {
 	protected $_schema;
 	protected $_extendedSchema;
 	protected $_modelName;
-	protected $_lastValidationErrors;
 	protected $_extendedTables;
 	protected $_extendedClasses;
 	protected $_extendedInstances;
@@ -177,6 +176,16 @@ abstract class DATA_Model extends CI_Model {
 				$this->db->join($table, $this->db->dbprefix($table) . '.' . $key . ' = ' . $this->getTableName() . '.' . $key, 'left');
 			}
 		}
+		
+		$columnsToTranslate = $this->columnsToTranslate();
+		
+		if(is_module_installed('traductions') && !empty($columnsToTranslate)) {
+			$this->load->helper('locale');
+			$locale = locale();
+			$tableName = $this->getTableName();
+			$tableTranslationsName = $tableName.'_translations';
+			$this->db->join($tableTranslationsName, "$tableTranslationsName.id = $tableName.id AND $tableTranslationsName.lang = '$locale'", 'left');
+		}
 
 		if ($this->_joins) {
 			foreach ($this->_joins as $join) {
@@ -298,7 +307,6 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function fromDatas($datas = null) {
-		$this->resetErrors();
 		$primaries = $this->getPrimaryColumns();
 		$isUpdate = true;
 		$input = $datas ? $datas : $_POST;
@@ -311,12 +319,12 @@ abstract class DATA_Model extends CI_Model {
 		}
 		$rules = $isUpdate ? $this->validationRulesForUpdate($input) : $this->validationRulesForInsert($input);
 		$this->load->library('form_validation');
+		$this->form_validation->reset_validation();
 		if ($datas) {
 			$this->form_validation->set_data($datas);
 		}
 		$this->form_validation->set_rules($rules);
 		if (!$this->form_validation->run()) {
-			$this->addErrors($this->form_validation->error_array());
 			return false;
 		}
 		$uploadPaths = $this->uploadPaths();
@@ -335,15 +343,12 @@ abstract class DATA_Model extends CI_Model {
 				}
 			}
 		}
-		
-		$this->addErrors($this->upload->error_msg);
-		
 		if ($datas) {
 			return $this->save($this->filterInvalidFields($datas));
 		}
 		return $this->save($this->filterInvalidFields($_POST));
 	}
-	
+
 	private function doUpload(&$datas, $uploadPath, $key) {
 		$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
 		if ($this->upload->do_upload($key)) {
@@ -354,22 +359,6 @@ abstract class DATA_Model extends CI_Model {
 			}
 		}
 	}
-	
-	public function getLastErrors() {
-		return $this->_lastValidationErrors;
-	}
-	
-	public function getLastErrorsString($open= '<p>',$close = '</p>') {
-		return $open.implode($close.$open, $this->_lastValidationErrors).$close;
-	}
-	
-	private function addErrors($errors) {
-		$this->_lastValidationErrors = array_merge($this->_lastValidationErrors,$errors);
-	}
-	
-	private function resetErrors() {
-		$this->_lastValidationErrors = array();
-	}
 
 	public function get($where = null, $type = 'object', $columns = null) {
 		$this->prepareGet($where, $type, $columns);
@@ -378,8 +367,31 @@ abstract class DATA_Model extends CI_Model {
 		}
 		$query = $this->db->get();
 		$this->clear();
-		if ($query->num_rows()) {
-			return $query->result($type);
+		$numRows = $query->num_rows();
+		if ($numRows) {
+			$res = $query->result($type);
+			if(!is_module_installed('traductions')) return $res;
+			$columnsToTranslate = $this->columnsToTranslate();
+			$isObjectType = $type === 'object';
+			for($i=0; $i < $numRows; $i++) {
+				$row = $res[$i];
+				if($isObjectType) $row = (array) $row;
+				foreach ($row as $field => $value) {
+					
+					if(array_key_exists($field.'_lang', $row)){
+						$translation = $row[$field.'_lang'];
+						unset($row[$field.'_lang']);
+						if(in_array($field, $columnsToTranslate)){
+							if($translation) {
+								$row[$field] = $translation;
+							}
+						}
+					}
+				}
+				if($isObjectType) $row = (object) $row;
+				$res[$i] = $row;
+			}
+			return $res;
 		}
 		return false;
 	}
@@ -403,15 +415,15 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function getRow($where = array(), $type = 'object', $columns = null) {
-		$this->prepareGet($where, $type, $columns);
 
 		$this->db->limit(1);
 
-		$query = $this->db->get();
-		if ($query->num_rows()) {
-			$res = $query->result($type);
-			return $res[0];
+		$get = $this->get($where, $type, $columns);
+		
+		if($get){
+			return $get[0];
 		}
+		
 		return false;
 	}
 
@@ -420,7 +432,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function getAlias($alias, $type = 'object', $columns = null) {
-		return $this->getRow(array($this->db->dbprefix($this->getTableName()) . 'alias' => $alias), $type, $columns);
+		return $this->getRow(array($this->db->dbprefix($this->getTableName()) . '.alias' => $alias), $type, $columns);
 	}
 
 	public function delete($where = null) {
@@ -530,6 +542,7 @@ abstract class DATA_Model extends CI_Model {
 		$extendedTables = $this->getExtendedTables();
 		$extendedClasses = $this->getExtendedClasses();
 		$primaryCols = $this->$baseModel->getPrimaryColumns();
+		
 		if (count($primaryCols) > 1) {
 			// insert on multi primary cols
 			// not supported yet
@@ -538,6 +551,20 @@ abstract class DATA_Model extends CI_Model {
 		}
 		$key = $primaryCols[0];
 		$datas[$key] = $insertedId;
+		if(is_module_installed('traductions')) {
+			$this->load->helper('locale');
+			$locale = locale();
+			$columsToTranslate = $this->columnsToTranslate();
+			if(!empty($columsToTranslate)) {
+				$datasTranslate = array('lang'=>$locale,$key=>$datas[$key]);
+				foreach($datas as $field => $value) {
+					if(in_array($field, $columsToTranslate) && isset($datas[$field])){
+						$datasTranslate[$field.'_lang'] = $datas[$field];
+					}
+				}
+				$this->db->insert($this->getTableName().'_translations', $datasTranslate);
+			}
+		}
 		for ($i = 1; $i < count($extendedTables); $i++) {
 			$table = $extendedTables[$i];
 			$model = strtolower($extendedClasses[$i]);
@@ -550,6 +577,7 @@ abstract class DATA_Model extends CI_Model {
 			}
 			$this->db->insert($table, $datasToInsert);
 		}
+		
 		$this->afterInsert($insertedId, $datas);
 		return $insertedId;
 	}
@@ -568,6 +596,33 @@ abstract class DATA_Model extends CI_Model {
 				$where[$this->db->dbprefix($this->getTableName()) . '.' . $col] = $datas[$col];
 			}
 		}
+		$key = $primaries[0];
+		if(is_module_installed('traductions')) {
+			$this->load->helper('locale');
+			$locale = locale();
+			$columsToTranslate = $this->columnsToTranslate();
+			if(!empty($columsToTranslate)) {
+				$datasTranslate = array('lang'=>$locale,$key=>$datas[$key]);
+				foreach($datas as $field => $value) {
+					if(in_array($field, $columsToTranslate) && isset($datas[$field])){
+						$datasTranslate[$field.'_lang'] = $datas[$field];
+					}
+				}
+				$translateTable = $this->getTableName().'_translations';
+				$transWhere = array();
+				foreach ($primaries as $col) {
+					$transWhere[$this->db->dbprefix($translateTable) . '.' . $col] = $datas[$col];
+				}
+				$transWhere[$this->db->dbprefix($translateTable) . '.lang'] = $locale;
+				$this->db->where($transWhere);
+				$result = $this->db->get($translateTable);
+				if($result->num_rows()) {
+					$this->db->update($translateTable, $datasTranslate, $transWhere);
+				} else {
+					$this->db->insert($translateTable, $datasTranslate);
+				}
+			}
+		}
 		foreach ($primaries as $col) {
 			unset($datas[$col]);
 		}
@@ -583,7 +638,7 @@ abstract class DATA_Model extends CI_Model {
 						$datasToUpdate[$col] = $datas[$col];
 				}
 			}
-			$key = $primaries[0];
+			
 			$idsToUpdateRow = $this->get($where, 'object', array($this->db->dbprefix($this->getTableName()) . '.' . $key));
 			$idsToUpdate = array();
 			foreach ($idsToUpdateRow as $row) {
@@ -911,6 +966,10 @@ abstract class DATA_Model extends CI_Model {
 						. 'FROM ' . $linkTable . ' '
 						. 'WHERE ' . $model . '_' . $key . ' '
 						. (is_array($value) ? 'IN (' . implode(',', $value) . ')' : '= ' . $this->db->escape($value)) . ')');
+	}
+	
+	public function columnsToTranslate() {
+		return array();
 	}
 
 //	private function hasAlias() {
