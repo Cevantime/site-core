@@ -1045,6 +1045,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 	
 	public function getLocale() {
+		$this->load->helper('locale');
 		if(!$this->_locale) {
 			$this->_locale = locale();
 		}
