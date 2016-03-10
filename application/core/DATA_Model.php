@@ -20,6 +20,7 @@ abstract class DATA_Model extends CI_Model {
 	protected $_extendedTables;
 	protected $_extendedClasses;
 	protected $_extendedInstances;
+	protected $_columnsToTranslate;
 	protected $_joins;
 	protected $_compileQueryOnly = false;
 	protected $_locale;
@@ -50,14 +51,13 @@ abstract class DATA_Model extends CI_Model {
 			return $this->_extendedSchema;
 		} else {
 			if ($this->_schema === null) {
-				$this->_schema = array();
 				$table = $this->getTableName();
 				$fields = $this->db->list_fields($this->db->dbprefix($table));
 				$cols = array();
 				foreach ($fields as $field) {
 					$cols[] = $field;
 				}
-				$this->_schema = array_merge($this->_schema, $cols);
+				$this->_schema = $cols;
 			}
 			return $this->_schema;
 		}
@@ -1039,7 +1039,17 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function columnsToTranslate() {
-		return array();
+		if($this->_columnsToTranslate === null)  {
+			$translationTable = $this->getTableName().'_translations';
+			$fields = $this->db->list_fields($this->db->dbprefix($translationTable));
+			$this->_columnsToTranslate = array();
+			foreach ($fields as $field) {
+				if($field != 'id' && $field != 'lang') {
+					$this->_columnsToTranslate[] = $field;
+				}
+			}
+		}
+		return $this->columnsToTranslate();
 	}
 	
 	public function setLocale($locale = null) {
