@@ -353,7 +353,11 @@ abstract class DATA_Model extends CI_Model {
 			$oldLocale = $this->getLocale();
 			$this->setLocale($input['lang']);
 		}
-		$res = $this->save($this->filterInvalidFields($input));
+		if($datas) {
+			$res = $this->save($this->filterInvalidFields($datas));
+		} else {
+			$res = $this->save($this->filterInvalidFields($_POST));
+		}
 		if($hasLang) {
 			$this->setLocale($oldLocale);
 		}
