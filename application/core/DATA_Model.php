@@ -22,6 +22,7 @@ abstract class DATA_Model extends CI_Model {
 	protected $_extendedInstances;
 	protected $_joins;
 	protected $_compileQueryOnly = false;
+	protected $_columnsToTranslate;
 
 	protected function getModelName() {
 		if (!$this->_modelName) {
@@ -1030,7 +1031,21 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	public function columnsToTranslate() {
-		return array();
+		if($this->_columnsToTranslate === null){
+			$this->_columnsToTranslate = array();
+			$tableTrads = $this->db->dbprefix($this->getTableName().'_translations');
+			if($this->db->table_exists($tableTrads)){
+				$fieldsTrad = $fields = $this->db->list_fields($tableTrads);
+				$schema = $this->getSchema();
+				foreach ($schema as $field) {
+					if(in_array($field.'_lang', $fieldsTrad)) {
+						$this->_columnsToTranslate[] = $field;
+					}
+				}
+			}
+		}
+		
+		return $this->_columnsToTranslate;
 	}
 
 //	private function hasAlias() {
