@@ -238,6 +238,7 @@ class Core_CLI {
 		}
 
 		Core_utils::full_move("$name/site-core/system", "$basepath/system");
+		Core_utils::full_move("$name/site-core/tools", "$basepath/tools");
 		rename("$name/site-core/application/core/DATA_Model.php", "$basepath/application/core/DATA_Model.php");
 		Core_utils::full_move("$name/site-core/application/helpers", "$basepath/application/helpers");
 		Core_utils::full_move("$name/site-core/application/models", "$basepath/application/models");

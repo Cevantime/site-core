@@ -243,8 +243,8 @@ class Module_CLI {
     }
 	
 	private function compareVersions($version1, $version2){
-		$v1_array = explode(',', $version1);
-		$v2_array = explode(',', $version2);
+		$v1_array = explode('.', $version1);
+		$v2_array = explode('.', $version2);
 		for($i = 0; $i<3; $i++){
 			if($v1_array[$i] > $v2_array[$i]){
 				return 1;
