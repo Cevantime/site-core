@@ -210,7 +210,9 @@ class Module_CLI {
 		// looking for an already installed version
 		$dir_module = MODULE_PATH . "/$module_name" ;
 		if(file_exists($dir_module)){
-			$installed_version = file_get_contents($dir_module.'/module.version');
+			$moduleInfos = json_decode(file_get_contents($dir_module.'/module.json'));
+			$installed_version = $moduleInfos->version;
+			
 			if($installed_version) {
 				$comp = $this->compareVersions($version, $installed_version);
 				if($comp === 0) {
