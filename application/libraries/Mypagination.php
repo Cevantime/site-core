@@ -99,7 +99,9 @@ class Mypagination {
 		$start = $pagination['start'];
 		$offset = $pagination['offset'];
 		$max = $pagination['max'];
-		$target = $target_action;
+		$hasStart = strpos($target_action, '/start/');
+		if($hasStart !== FALSE) $target = substr($target_action, 0, $hasStart);
+		else $target = $target_action;
 		if ($max > 0) {
 			$html = '<'.$mainWraper.' class="pagination" id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
 			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
@@ -123,8 +125,9 @@ class Mypagination {
 		$start = $pagination['start'];
 		$offset = $pagination['offset'];
 		$max = $pagination['max'];
-		$target = $target_action;
-		
+		$hasStart = strpos($target_action, '/start/');
+		if($hasStart !== FALSE) $target = substr($target_action, 0, $hasStart);
+		else $target = $target_action;
 		if ($max > 0) {
 			$html = '<'.$mainWraper.' class="pagination paginationAjax"'.$data_container.' id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
 			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
