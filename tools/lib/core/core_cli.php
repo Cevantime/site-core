@@ -6,10 +6,10 @@ define('CORE_SOURCE', 'https://github.com/Cevantime/site-core.git');
 
 class Core_CLI {
 
-	public $module_sources;
 	private static $commands = array(
 		'help' => 'help',
 		'install' => 'install',
+		'installdb' => 'installdb',
 		'update' => 'update',
 //        'search' => 'search',
 		'sources' => 'sources',
@@ -18,8 +18,7 @@ class Core_CLI {
 		'' => 'help' // default action
 	);
 
-	function __construct($core_sources) {
-		$this->module_sources = $core_sources;
+	function __construct() {
 	}
 
 	function execute($command, $args = array()) {
@@ -124,14 +123,15 @@ class Core_CLI {
 	}
 
 	private function install($args) {
-		$name = sys_get_temp_dir().'/'.uniqid();
+		$name = sys_get_temp_dir() . '/' . uniqid();
 		$basepath = realpath(__DIR__ . '/../../../');
 		Core_utils::line('installing the module in ' . $name);
+		$sep = Core_utils::os_sep();
 		$cmd = '';
-		$cmd .= "git init $name;";
-		$cmd .= "cd $name;";
+		$cmd .= "git init $name $sep";
+		$cmd .= "cd $name $sep";
 
-		$cmd .= 'git clone ' . CORE_SOURCE . ';';
+		$cmd .= 'git clone ' . CORE_SOURCE .' '. $sep;
 
 		Core_utils::line("executing : $cmd");
 		exec($cmd);
@@ -144,83 +144,65 @@ class Core_CLI {
 		Core_utils::full_move("$name/site-core", "$basepath/");
 		Core_utils::remove_full_directory($name);
 		Core_utils::remove_full_directory("$basepath/.git");
-		$app_env = Core_utils::scan('Your APPLICATION_ENV (alto/thibault/default) :');
-		//putenv('APPLICATION_ENV=default');
-		Core_utils::sed($basepath . '/dbchanges/liquibase/update.php', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
-		$database = Core_utils::scan('Should your app have a database (Y/n) :');
-		$database = strtolower($database);
+		$database = Core_utils::scan('Should your app have a mysql database (Y/n) :');
 		if (!$database OR $database === 'y') {
 			$database = true;
 		} else {
 			$database = false;
 		}
 		if ($database) {
-			Core_utils::line("The script will now install your new database. It assumes you use a mysql database.");
-			$database_hostname = Core_utils::scan('Database host (localhost/ip address) : ');
-			$root = Core_utils::scan('root username (probably root) : ');
-			$root_password = Core_utils::scan('root password : ');
-			$database_database = Core_utils::scan('Database name : ');
-			$database_username = Core_utils::scan('Database user : ');
-			$database_password = Core_utils::scan('Database password : ');
-			try {
-				$dbh = new PDO("mysql:host=$database_hostname", $root, $root_password);
-
-				$dbh->exec("CREATE DATABASE `$database_database`;
-						CREATE USER '$database_username'@'localhost' IDENTIFIED BY '$database_password';
-						GRANT ALL ON `$database_database`.* TO '$database_username'@'localhost';
-						FLUSH PRIVILEGES;") 
-				OR Core_utils::error(print_r($dbh->errorInfo(), true));
-				if($app_env != 'default') {
-					Core_utils::line('The database has been successfully created. Copying config...');
-					$database_ci_config = file_get_contents("$basepath/application/config/database.php");
-					//$db['default']['dbdriver'] = 'mysqli';
-					preg_match_all('#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#', $database_ci_config, $matches);
-					$toAppend = "\n";
-					$matches = $matches[0];
-					foreach ($matches as $match) {
-						foreach (
-								array(
-									'hostname',
-									'username',
-									'password',
-									'database',
-									'dbdriver',
-									'dbprefix',
-									'pconnect',
-									'db_debug',
-									'cache_on',
-									'cachedir',
-									'char_set',
-									'dbcollat',
-									'swap_pre',
-									'autoinit',
-									'stricton'
-								) as $prop){
-							$pattern = '#\$db.*?\[\'default\'\].*?\[\''.$prop.'\'?\].*?=(.*)?;#';
-							if(preg_match($pattern, $match)){
-								if(isset(${'database_'.$prop})){
-									$match = preg_replace($pattern, "\$db['$app_env']['$prop'] = '".${'database_'.$prop}."';", $match);
-								} else {
-									$match = preg_replace($pattern, "\$db['$app_env']['$prop'] = $1;", $match);
-								}
-							}
-						}
-						$toAppend .= "$match\n";
-					}
-					file_put_contents("$basepath/application/config/database.php", $database_ci_config.$toAppend);
-				}
-				Core_utils::line('...running liquibase...');
-				`php dbchanges/liquibase/update.php`;
-			} catch (PDOException $e) {
-				Core_utils::error(  $e->getMessage() );
-			}
-
+			$this->installdb($args);
 		}
 		Core_utils::notice('Installation completed - You\'re on fire!');
 	}
-	
+
+	private function installdb($args) {
+		Core_utils::line("The script will now install your new database. It assumes you use a mysql database.");
+		$app_env = Core_utils::scan('Your APPLICATION_ENV (alto/thibault/production etc.) :');
+		//putenv('APPLICATION_ENV=default');
+		Core_utils::sed('./dbchanges/liquibase/update.php', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
+		$database = strtolower($database);
+		$database_hostname = Core_utils::scan('Database host (localhost/ip address) : ');
+		$root = Core_utils::scan('root username (probably root) : ');
+		$root_password = Core_utils::scan('root password : ');
+		$database_database = Core_utils::scan('Database name : ');
+		$database_username = Core_utils::scan('Database user : ');
+		$database_password = Core_utils::scan('Database password : ');
+		try {
+			$dbh = new PDO("mysql:host=$database_hostname", $root, $root_password);
+
+			$dbh->exec("CREATE DATABASE `$database_database`;
+						CREATE USER '$database_username'@'localhost' IDENTIFIED BY '$database_password';
+						GRANT ALL ON `$database_database`.* TO '$database_username'@'localhost';
+						FLUSH PRIVILEGES;")
+					OR Core_utils::error(print_r($dbh->errorInfo(), true));
+			if ($app_env != 'default') {
+				Core_utils::line('The database has been successfully created. Copying config...');
+				$database_ci_config = file_get_contents("./application/config/database.php");
+				//$db['default']['dbdriver'] = 'mysqli';
+				preg_match_all('#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#', $database_ci_config, $matches);
+				$toAppend = "\n";
+				$matches = $matches[0];
+				foreach ($matches as $match) {
+					foreach (array('hostname', 'username', 'password', 'database') as $prop) {
+						$pattern = '#\$db.*?\[\'default\'\].*?\[\'' . $prop . '\'?\].*?=.*?;#';
+						if (preg_match($pattern, $match)) {
+							$match = preg_replace($pattern, "\$db['$app_env']['$prop'] = '" . ${'database_' . $prop} . "';", $match);
+						}
+					}
+					$toAppend .= "$match\n";
+				}
+				file_put_contents("./application/config/database.php", $database_ci_config . $toAppend);
+			}
+			Core_utils::line('...running liquibase...');
+			`php dbchanges/liquibase/update.php`;
+		} catch (PDOException $e) {
+			Core_utils::error($e->getMessage());
+		}
+	}
+
 	private function update($args) {
-		$name = sys_get_temp_dir().'/'.uniqid();
+		$name = sys_get_temp_dir() . '/' . uniqid();
 		$basepath = realpath(__DIR__ . '/../../../');
 		Core_utils::line('installing the module in ' . $name);
 		$cmd = '';
@@ -238,14 +220,13 @@ class Core_CLI {
 		}
 
 		Core_utils::full_move("$name/site-core/system", "$basepath/system");
-		Core_utils::full_move("$name/site-core/tools", "$basepath/tools");
 		rename("$name/site-core/application/core/DATA_Model.php", "$basepath/application/core/DATA_Model.php");
 		Core_utils::full_move("$name/site-core/application/helpers", "$basepath/application/helpers");
 		Core_utils::full_move("$name/site-core/application/models", "$basepath/application/models");
 		Core_utils::full_move("$name/site-core/application/libraries", "$basepath/application/libraries");
 		Core_utils::full_move("$name/site-core/application/third_party", "$basepath/application/third_party");
 		Core_utils::remove_full_directory($name);
-		
+
 		Core_utils::notice('Update successfull - You\'re on fire!');
 	}
 

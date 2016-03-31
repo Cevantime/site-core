@@ -130,6 +130,10 @@ class Core_utils {
 		return false;
 	}
 	
+	static function os_sep() {
+		return Core_utils::is_os('linux') || Module_utils::is_os('mac') ? ';' : '&';
+	}
+	
 	static function list_files($dir){
 		$scan = scandir($dir);
 		$files = array();
@@ -149,7 +153,7 @@ class Core_utils {
 	}
 	
 	static function sed($filename, $pattern, $replace) {
-		$file_contents = file_get_contents($filename);
+		$file_contents = file_get_contents(realpath($filename));
 		$rep = preg_replace($pattern, $replace, $file_contents);
 		
 		if($rep) {

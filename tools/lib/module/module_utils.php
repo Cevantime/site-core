@@ -105,6 +105,10 @@ class Module_utils {
         }
     }
 	
+	static function os_sep() {
+		return Module_utils::is_os('linux') || Module_utils::is_os('mac') ? ';' : '&';
+	}
+	
 	static function is_os($osname){
 		$osname = strtolower($osname);
 		$uname = php_uname('s');

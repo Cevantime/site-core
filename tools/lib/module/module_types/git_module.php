@@ -74,7 +74,7 @@ class Git_module extends Module_type {
         Module_utils::line('testing module existency');
         $cmd = '';
 		Module_utils::line('os detected : '.(Module_utils::is_os('linux') ? 'linux' : 'windaube'));
-		$sep = Module_utils::is_os('linux') ? ';' : '&';
+		$sep = Module_utils::os_sep();
         if (!file_exists($this->temp_path)) {
             $cmd .= "git init $this->temp_path $sep ";
 //            `git init $this->temp_path`;

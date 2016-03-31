@@ -5,7 +5,7 @@ require_once 'lib/core/core_cli.php';
 
 
 // take commands
-$cli = new Core_CLI($sources);
+$cli = new Core_CLI();
 
 $cmd = $argc > 1 ? $argv[1] : null;
 $args = $argc > 2 ? array_slice($argv, 2) : array();
