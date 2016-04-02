@@ -180,15 +180,22 @@ class Core_CLI {
 				Core_utils::line('The database has been successfully created. Copying config...');
 				$database_ci_config = file_get_contents("./application/config/database.php");
 				//$db['default']['dbdriver'] = 'mysqli';
-				preg_match_all('#\$db.*?\[\'default\'\].*?\[.*?\].*?=.*?;#', $database_ci_config, $matches);
+				$global_pattern = '#\$db.*?\[\'default\'\].*?\[(.*?)\].*?=(.*?);#';
+				preg_match_all($global_pattern, $database_ci_config, $matches);
 				$toAppend = "\n";
 				$matches = $matches[0];
 				foreach ($matches as $match) {
+					$matchProp = false;
 					foreach (array('hostname', 'username', 'password', 'database') as $prop) {
 						$pattern = '#\$db.*?\[\'default\'\].*?\[\'' . $prop . '\'?\].*?=.*?;#';
 						if (preg_match($pattern, $match)) {
 							$match = preg_replace($pattern, "\$db['$app_env']['$prop'] = '" . ${'database_' . $prop} . "';", $match);
+							$matchProp = true;
+							break;
 						}
+					}
+					if(!$matchProp) {
+						$match = preg_replace($global_pattern, "\$db['$app_env'][$1] = $2;", $match);
 					}
 					$toAppend .= "$match\n";
 				}
