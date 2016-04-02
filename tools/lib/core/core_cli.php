@@ -145,7 +145,7 @@ class Core_CLI {
 		Core_utils::remove_full_directory($name);
 		Core_utils::remove_full_directory("$basepath/.git");
 		$database = Core_utils::scan('Should your app have a mysql database (Y/n) :');
-		if (!$database OR $database === 'y') {
+		if (!$database OR strtolower($database === 'y')) {
 			$database = true;
 		} else {
 			$database = false;
