@@ -23,6 +23,7 @@ abstract class DATA_Model extends CI_Model {
 	protected $_joins;
 	protected $_compileQueryOnly = false;
 	protected $_columnsToTranslate;
+	protected $_lastSavedDatas;
 
 	protected function getModelName() {
 		if (!$this->_modelName) {
@@ -580,7 +581,9 @@ abstract class DATA_Model extends CI_Model {
 			if (array_key_exists($col, $datas))
 				$datasToInsert[$col] = $datas[$col];
 		}
-		return $this->db->insert($this->$modelName->getTableName(), $datasToInsert);
+		$ret = $this->db->insert($this->$modelName->getTableName(), $datasToInsert);
+		$this->_lastSavedDatas = $datasToInsert;
+		return $ret;
 	}
 
 	public function insert($datas = null) {
@@ -604,10 +607,10 @@ abstract class DATA_Model extends CI_Model {
 		$extendedTables = $this->getExtendedTables();
 		$extendedClasses = $this->getExtendedClasses();
 		$primaryCols = $this->$baseModel->getPrimaryColumns();
-
 		if (count($primaryCols) > 1) {
 			// insert on multi primary cols
 			// not supported yet
+			$this->_lastSavedDatas = $datas;
 			$this->afterInsert($insertedId, $datas);
 			return $insertedId;
 		}
@@ -640,6 +643,7 @@ abstract class DATA_Model extends CI_Model {
 				$this->db->insert($this->getTableName() . '_translations', $datasTranslate);
 			}
 		}
+		$this->_lastSavedDatas = $datas;
 		$this->afterInsert($insertedId, $datas);
 		return $insertedId;
 	}
@@ -1011,6 +1015,10 @@ abstract class DATA_Model extends CI_Model {
 				}
 			}
 		}
+	}
+	
+	public function getLastSavedDatas() {
+		return $this->_lastSavedDatas;
 	}
 
 	public function getThrough($table, $model, $value, $key = 'id') {

@@ -23,7 +23,7 @@ class BBCodeParser extends JBBCode\Parser {
 		$this->addCodeDefinition($builder->build());
 
 		$builder = new JBBCode\CodeDefinitionBuilder('code', '<pre class="brush: {option}; toolbar: false; first-line: 1; class-name: \'my_personnal_code\'">{param}</pre>');
-		$builder->setUseOption(true);
+//		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
 		
 		$builder = new JBBCode\CodeDefinitionBuilder('image', '<img src="{option}" alt="{param}"/>');
@@ -83,14 +83,14 @@ class BBCodeParser extends JBBCode\Parser {
 		$this->addCodeDefinition($builder->build());
 
 		/*		 * ********** la suite est non implémentée à ce jour côté javascript !! ** */
-		$builder = new JBBCode\CodeDefinitionBuilder('section1', '<h2 class="section" id="{option}">{param}</h1>');
+		$builder = new JBBCode\CodeDefinitionBuilder('h2', '<h2 class="section" id="{option}">{param}</h1>');
 		//$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
 
-		$builder = new JBBCode\CodeDefinitionBuilder('section2', '<h3 class="section" >{param}</h2>');
+		$builder = new JBBCode\CodeDefinitionBuilder('h3', '<h3 class="section" >{param}</h2>');
 		$this->addCodeDefinition($builder->build());
 		
-		$builder = new JBBCode\CodeDefinitionBuilder('section3', '<h4 class="section" >{param}</h2>');
+		$builder = new JBBCode\CodeDefinitionBuilder('h4', '<h4 class="section" >{param}</h2>');
 		$this->addCodeDefinition($builder->build());
 
 		$builder = new JBBCode\CodeDefinitionBuilder('p', '<p>{param}</p>');
@@ -107,6 +107,8 @@ class BBCodeParser extends JBBCode\Parser {
 		$this->addCodeDefinition($builder->build());
 		
 		$builder = new JBBCode\CodeDefinitionBuilder('*', '<li>{param}</li>');
+		$this->addCodeDefinition($builder->build());
+		$builder = new JBBCode\CodeDefinitionBuilder('li', '<li>{param}</li>');
 		$this->addCodeDefinition($builder->build());
 		
 		$builder = new JBBCode\CodeDefinitionBuilder('youtube', '<iframe width="560" height="315" src="{param}" frameborder="0" allowfullscreen></iframe>');
@@ -137,7 +139,10 @@ class BBCodeParser extends JBBCode\Parser {
 
 	public function parse($str) {
 		$str = str_replace("\t", "    ", $str);
-		$str = str_replace("\r\n", '[br][/br]', $str);
+		$regex = "#(.*?)\r\n#";
+		$regex2 = "#\[p\](.*?)(\[/?(h1|h2|h3|h4|h5|h6|li|ul|div|pre|code|sectioncode|legend|quote|becareful|info|left|leftedcode|center|justify|section2|section3|p|ol|list|\*|youtube|video|table|td|tr)(=.*?)?\])(.*?)\[/p\]\r\n#";
+		$str = preg_replace($regex, "[p]$1[/p]\r\n", $str . "\r\n");
+		$str = preg_replace($regex2, "$1$2$5\r\n", $str);
 		$str = html_escape($str);
 		parent::parse($str);
 		$treeRoot = &$this->treeRoot;
