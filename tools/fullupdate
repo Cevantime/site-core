@@ -1,0 +1,30 @@
+<?php
+
+echo "pulling from git\n";
+exec("sudo git pull");
+echo "running liquibase\n";
+exec('php dbchanges/liquibase/update.php');
+if (file_exists('./application/modules/traductions')) {
+	define('BASEPATH', 'toto');
+	$db = array();
+	putenv('LANG=fr_FR.UTF-8');
+	putenv('APPLICATION_ENV=default');
+
+	require_once __DIR__ . '/../application/config/database.php';
+
+	$liquibaseJarFile = __DIR__ . '/../application/modules/traductions/third_party/translate.jar';
+
+	$db_active = $db[$active_group];
+
+	$username = $db_active['username'];
+	$password = $db_active['password'];
+	$dbhost = $db_active['hostname'];
+	$dbname = $db_active['database'];
+	$output = array();
+	echo "generating traductions\n";
+	foreach (array('fr', 'en', 'ru') as $lang) {
+		exec("java -jar $liquibaseJarFile translate . $lang $dbhost,$dbname,$username,$password 2>&1", $output);
+	}
+}
+
+
