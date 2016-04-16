@@ -689,6 +689,7 @@ abstract class DATA_Model extends CI_Model {
 				}
 			}
 		}
+		$fullDatas = $datas;
 		foreach ($primaries as $col) {
 			unset($datas[$col]);
 		}
@@ -736,11 +737,13 @@ abstract class DATA_Model extends CI_Model {
 					$ret = $this->db->update($table, $datasToUpdate);
 				}
 			}
-			$this->afterUpdate($datas, $where);
+			$this->_lastSavedDatas = $fullDatas;
+			$this->afterUpdate($fullDatas, $where);
 			return $ret;
 		} else {
 			$ret = $this->db->update($this->getTableName(), $datas, $where);
-			$this->afterUpdate($datas, $where);
+			$this->_lastSavedDatas = $fullDatas;
+			$this->afterUpdate($fullDatas, $where);
 			return $ret;
 		}
 	}
