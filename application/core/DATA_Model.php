@@ -411,7 +411,6 @@ abstract class DATA_Model extends CI_Model {
 			return $this->db->get_compiled_select();
 		}
 		$query = $this->db->get();
-		$this->clear();
 		$numRows = $query->num_rows();
 		if ($numRows) {
 			$res = $query->result($type);
@@ -504,7 +503,6 @@ abstract class DATA_Model extends CI_Model {
 			foreach ($this->getPrimaryColumns() as $col) {
 				$where[$col] = $this->{$col};
 			}
-			$this->clear();
 		}
 		return $this->db->delete($this->getBaseTableName(), $where);
 	}
@@ -543,6 +541,15 @@ abstract class DATA_Model extends CI_Model {
 			$array[array_pop(explode('.', $key))] = $value;
 		}
 		return $array;
+	}
+	
+	public function toObject() {
+		$obj = new stdClass();
+		foreach ($this->_datas as $key => $value) {
+			$field= array_pop(explode('.', $key));
+			$obj->{$field} = $value;
+		}
+		return $obj;
 	}
 
 	public function __get($key) {
@@ -968,9 +975,7 @@ abstract class DATA_Model extends CI_Model {
         FROM {PRE}' . $this->getTableName() . '
 		WHERE {PRE}' . $this->getTableName() . '.' . $order . ' >= ' . $this->db->escape($this->{$order}) . '';
 		$res = $this->db->query($query)->result();
-		if (!$hasId) {
-			$this->clear();
-		}
+		
 		return $res[0]->count;
 	}
 
