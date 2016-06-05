@@ -72,7 +72,6 @@
 				$pop.append($close);
 				$close.html(defaults.closeButton);
 			}
-			console.log($popupWrap.find('.close-popup'));
 			$popupWrap.find('.close-popup').click(function(){
 				close($popupWrap, $popup);
 			});

@@ -192,21 +192,6 @@ class Module_CLI {
 		if(!$version) {
 			return $this->failtown('you must specify a version flag');
 		}
-
-        // retrieve the spark details
-        foreach ($this->module_sources as $source)
-        {
-            Module_utils::notice("Retrieving module detail from " . $source->get_url());
-            $module = $source->get_module($module_name, $version);
-            if ($module != null) break;
-        }
-
-        // did we find the details?
-        if ($module == null)
-        {
-            throw new Module_exception("Unable to find module: $module_name ($version) in any sources");
-        }
-		
 		// looking for an already installed version
 		$dir_module = MODULE_PATH . "/$module_name" ;
 		if(file_exists($dir_module)){
@@ -214,7 +199,7 @@ class Module_CLI {
 			$installed_version = $moduleInfos->version;
 			
 			if($installed_version) {
-				$comp = $this->compareVersions($version, $installed_version);
+				$comp = $this->compare_versions($version, $installed_version);
 				if($comp === 0) {
 					Module_utils::notice('The module '.$module_name.' is already installed. No action needed.');
 					return ;
@@ -230,6 +215,21 @@ class Module_CLI {
 			}
 		}
 
+        // retrieve the module details
+        foreach ($this->module_sources as $source)
+        {
+            Module_utils::notice("Retrieving module detail from " . $source->get_url());
+            $module = $source->get_module($module_name, $version);
+            if ($module != null) break;
+        }
+
+        // did we find the details?
+        if ($module == null)
+        {
+            throw new Module_exception("Unable to find module: $module_name ($version) in any sources");
+        }
+		
+
         // verify the spark, and put out warnings if needed
         $module->verify();
 
@@ -242,7 +242,7 @@ class Module_CLI {
         Module_utils::notice('Module installed to ' . $module->installed_path() . ' - You\'re on fire!');
     }
 	
-	private function compareVersions($version1, $version2){
+	private function compare_versions($version1, $version2){
 		$v1_array = explode('.', $version1);
 		$v2_array = explode('.', $version2);
 		for($i = 0; $i<3; $i++){

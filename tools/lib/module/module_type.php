@@ -139,14 +139,14 @@ class Module_type {
 		$spark = $dependency['name'];
 		$version = $dependency['version'];
 		Module_utils::line('installing spark dependency : '.$spark);
-		`php tools/spark reinstall -v$version $spark`;
+		`php tools/spark install -v$version $spark`;
 		
 	}
 	private function install_module_dependency($dependency) {
 		$module = $dependency['name'];
 		$version = $dependency['version'];
 		Module_utils::line('installing module dependency : '.$module);
-		`php tools/module reinstall -v$version $module`;
+		`php tools/module install -v$version $module`;
 	}
 	
 	public function version() {

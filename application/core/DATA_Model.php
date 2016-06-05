@@ -290,11 +290,11 @@ abstract class DATA_Model extends CI_Model {
 	public abstract function getTableName();
 
 	public function validationRulesForInsert($datas) {
-		
+		return array();
 	}
 
 	public function validationRulesForUpdate($datas) {
-		
+		return array();
 	}
 
 	public function uploadPaths() {
@@ -332,6 +332,7 @@ abstract class DATA_Model extends CI_Model {
 			$this->addErrors($this->form_validation->error_array());
 			return false;
 		}
+		$this->load->library('upload');
 		$uploadPaths = $this->uploadPaths();
 		if ($uploadPaths) {
 			$files = $_FILES;
@@ -538,7 +539,8 @@ abstract class DATA_Model extends CI_Model {
 	public function toArray() {
 		$array = array();
 		foreach ($this->_datas as $key => $value) {
-			$array[array_pop(explode('.', $key))] = $value;
+			$exploded = explode('.', $key);
+			$array[end($exploded)] = $value;
 		}
 		return $array;
 	}
