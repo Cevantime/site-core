@@ -46,7 +46,7 @@
  * @property Configuration $configuration
  * @property CI_DB_active_record $db
  */
-class CI_Controller {
+class MX_Controller {
 	
 }
 
