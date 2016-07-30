@@ -129,10 +129,11 @@ class Core_CLI {
 		Core_utils::line('installing the module in ' . $name);
 		$sep = Core_utils::os_sep();
 		$cmd = '';
+		
 		$cmd .= "git init $name $sep";
 		$cmd .= "cd $name $sep";
 
-		$cmd .= 'git clone ' . CORE_SOURCE .' '. $sep;
+		$cmd .= 'git clone -b site-core-2 ' . CORE_SOURCE .' '. $sep;
 
 		Core_utils::line("executing : $cmd");
 		exec($cmd);
