@@ -123,6 +123,7 @@ class Core_CLI {
 	}
 
 	private function install($args) {
+		
 		$name = sys_get_temp_dir() . '/' . uniqid();
 		$basepath = realpath(__DIR__ . '/../../../');
 		Core_utils::line('installing the module in ' . $name);
@@ -145,13 +146,17 @@ class Core_CLI {
 		Core_utils::remove_full_directory($name);
 		Core_utils::remove_full_directory("$basepath/.git");
 		$database = Core_utils::scan('Should your app have a mysql database (Y/n) :');
-		if (!$database OR strtolower($database === 'y')) {
-			$database = true;
-		} else {
-			$database = false;
-		}
+		$database = !$database OR strtolower($database === 'y');
+		
 		if ($database) {
 			$this->installdb($args);
+		}
+		$gulp = Core_utils::scan('Should your app have gulp integration (extra installation time) (y/N) :');
+		$gulp != $gulp && strtolower($gulp === 'y');
+		if($gulp) {
+			Core_utils::line('Installing gulp and preparing for continuous integration. Please wait for a few minutes.');
+			`npm install`;
+			`npm start`;
 		}
 		Core_utils::notice('Installation completed - You\'re on fire!');
 	}
