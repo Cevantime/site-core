@@ -138,11 +138,16 @@ class BBCodeParser extends JBBCode\Parser {
 	}
 
 	public function parse($str) {
+		// transform tab into four spaces
 		$str = str_replace("\t", "    ", $str);
-		$regex = "#(.*?)\r\n#";
+		// first regex to create paragraph for \r\n
+		$regex = "#(.+?)\r\n#";
+		// second regex to remove paragraph around blocks
 		$regex2 = "#\[p\](.*?)(\[/?(h1|h2|h3|h4|h5|h6|li|ul|div|pre|code|sectioncode|legend|quote|becareful|info|left|leftedcode|center|justify|section2|section3|p|ol|list|\*|youtube|video|table|td|tr|th)(=.*?)?\])(.*?)\[/p\]\r\n#";
+		
 		$str = preg_replace($regex, "[p]$1[/p]\r\n", $str . "\r\n");
 		$str = preg_replace($regex2, "$1$2$5\r\n", $str);
+		
 		$str = html_escape($str);
 		parent::parse($str);
 		$treeRoot = &$this->treeRoot;
