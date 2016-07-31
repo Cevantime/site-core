@@ -146,19 +146,34 @@ class Core_CLI {
 		Core_utils::full_move("$name/site-core", "$basepath/");
 		Core_utils::remove_full_directory($name);
 		Core_utils::remove_full_directory("$basepath/.git");
-		$database = Core_utils::scan('Should your app have a mysql database (Y/n) :');
-		$database = !$database OR strtolower($database === 'y');
 		
+		// take the folder name as project name
+		$project_name = end(explode('/', $basepath));
+		
+		Core_utils::sed( "$basepath/nbproject/project.xml", '#<name>(.*)</name>#', "<name>$project_name</name>");
+		
+		$database = Core_utils::scan('Should your app have a mysql database (Y/n) :');
+		$database = !$database || strtolower($database) !== 'n';
 		if ($database) {
 			$this->installdb($args);
 		}
+		
+		$config_gulp = json_decode(file_get_contents("$basepath/gulpfile.js/config.json"), true);
+		
+		$config_gulp['tasks']['browserSync']['proxy'] = 'localhost/'.($project_name);
+		
+		file_put_contents("$basepath/gulpfile.js/config.json", json_encode($config_gulp, JSON_PRETTY_PRINT));
+		
 		$gulp = Core_utils::scan('Should your app have gulp integration (extra installation time) (y/N) :');
-		$gulp != $gulp && strtolower($gulp === 'y');
+		
+		$gulp = $gulp && strtolower($gulp) === 'y';
+		
 		if($gulp) {
 			Core_utils::line('Installing gulp and preparing for continuous integration. Please wait for a few minutes.');
 			`npm install`;
 			`npm start`;
 		}
+		
 		Core_utils::notice('Installation completed - You\'re on fire!');
 	}
 

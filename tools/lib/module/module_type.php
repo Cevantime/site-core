@@ -38,7 +38,7 @@ class Module_type {
             $dependencies = array();
         }
 		if (file_exists("$this->temp_path/dependencies.json")) unlink("$this->temp_path/dependencies.json");
-		foreach(array('composer', 'spark', 'module') as $type){
+		foreach(array('composer', 'spark', 'module', 'node') as $type){
 			if(isset($dependencies[$type])&& is_array($dependencies[$type])) {
 				foreach ($dependencies[$type] as $dependency) {
 					$method = 'install_'.$type.'_dependency';
@@ -79,6 +79,7 @@ class Module_type {
 			file_put_contents($changeLogTargetPath, $changeToAppend);
 			
 			`php dbchanges/liquibase/update.php`;
+			`npm update`;
 			Module_utils::remove_full_directory($dbchangesPath);	
 		}
 		if(file_exists($this->installation_path.'/core')) {
@@ -90,17 +91,17 @@ class Module_type {
 			Module_utils::full_move($this->installation_path.'/core', $core_path);
 			Module_utils::remove_full_directory($this->installation_path.'/core');
 		}
-		if(file_exists($this->installation_path.'/js')) {
-			$this->put_in_module_map($this->installation_path.'/js', $module['map']);
-			$js_path = MODULE_PATH.'/../../js';
-			Module_utils::full_move($this->installation_path.'/js', $js_path);
-			Module_utils::remove_full_directory($this->installation_path.'/js');
+		if(file_exists($this->installation_path.'/assets')) {
+			$this->put_in_module_map($this->installation_path.'/assets', $module['map']);
+			$js_path = MODULE_PATH.'/../../assets';
+			Module_utils::full_move($this->installation_path.'/assets', $js_path);
+			Module_utils::remove_full_directory($this->installation_path.'/assets');
 		}
-		if(file_exists($this->installation_path.'/css')) {
-			$this->put_in_module_map($this->installation_path.'/css', $module['map']);
-			$css_path = MODULE_PATH.'/../../css';
-			Module_utils::full_move($this->installation_path.'/css', $css_path);
-			Module_utils::remove_full_directory($this->installation_path.'/css');
+		if(file_exists($this->installation_path.'/assets_src')) {
+			$this->put_in_module_map($this->installation_path.'/assets_src', $module['map']);
+			$css_path = MODULE_PATH.'/../../assets_src';
+			Module_utils::full_move($this->installation_path.'/assets_src', $css_path);
+			Module_utils::remove_full_directory($this->installation_path.'/assets_src');
 		}
 		$module['version'] = $this->version;
 		file_put_contents($this->installation_path.'/module.json', json_encode($module,JSON_PRETTY_PRINT));
@@ -147,6 +148,33 @@ class Module_type {
 		$version = $dependency['version'];
 		Module_utils::line('installing module dependency : '.$module);
 		`php tools/module install -v$version $module`;
+	}
+	
+	private function install_node_dependency($dependency) {
+		$module = $dependency['name'];
+		if (isset($dependency['version'])) {
+			$version = $dependency['version'];
+			$packageJson = file_get_contents(json_decode("$this->installation_path/package.json", true));
+			if($version != 'latest' && isset($packageJson['devDependencies'][$module])&& version_compare($packageJson['devDependencies'][$module], $version, '>=')) {
+				Core_utils::warning("The version $version of node module $module is required but a more recent version ({$packageJson['devDependencies'][$module]}) has been found. "
+				. "The older version won't be installed. Please upgrade the module version to make it work with version {$packageJson['devDependencies'][$module]} of module $module");
+				return;
+			}
+		}
+		if (isset($dependency['scope'])) {
+			$scope = $dependency['scope'];
+		}
+		Module_utils::line('installing node dependency : '.$module);
+		$cmd = 'npm install ';
+		if(isset($scope)) {
+			$cmd .= $scope.'/';
+		}
+		$cmd .= $module;
+		if(isset($version)) {
+			$cmd .= '@'.$version;
+		}
+		$cmd .= ' --save-dev';
+		`$cmd`;
 	}
 	
 	public function version() {

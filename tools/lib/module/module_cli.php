@@ -243,16 +243,7 @@ class Module_CLI {
     }
 	
 	private function compare_versions($version1, $version2){
-		$v1_array = explode('.', $version1);
-		$v2_array = explode('.', $version2);
-		for($i = 0; $i<3; $i++){
-			if($v1_array[$i] > $v2_array[$i]){
-				return 1;
-			} else if($v1_array[$i] < $v2_array[$i]) {
-				return -1;
-			}
-		}
-		return 0;
+		return - version_compare($version1, $version2);
 	}
 
     private function reinstall($args)

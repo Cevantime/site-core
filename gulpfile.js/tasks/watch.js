@@ -18,6 +18,8 @@ var watchTask = function() {
   })
   
   watch(path.join(config.root.src,'application/views/***/**/*'),browserSync.reload)
+  watch(path.join(config.root.src,'application/controllers/***/**/*'),browserSync.reload)
+  watch(path.join(config.root.src,'application/models/***/**/*'),browserSync.reload)
 }
 
 gulp.task('watch', ['browserSync'], watchTask)
