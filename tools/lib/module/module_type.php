@@ -61,10 +61,6 @@ class Module_type {
 			unlink($this->installation_path.'/prebuild.php');
 		}
 		
-		if(file_exists($this->installation_path.'/__CORE__')) {
-			
-		}
-		
 		if(file_exists($this->installation_path.'/dbchanges')){
 			Module_utils::line('installing dbchanges');
 			$dbchangesPath = $this->installation_path.'/dbchanges';
@@ -110,6 +106,13 @@ class Module_type {
 			Module_utils::full_move($this->installation_path.'/assets_src', $css_path);
 			Module_utils::remove_full_directory($this->installation_path.'/assets_src');
 		}
+		if(file_exists($this->installation_path.'/__CORE__')) {
+			$this->put_in_module_map($this->installation_path.'/__CORE__', $module['map']);
+			$core_path = '.';
+			Module_utils::full_move($this->installation_path.'/__CORE__/*', $core_path);
+			Module_utils::remove_full_directory($this->installation_path.'/__CORE__');
+		}
+		
 		$module['version'] = $this->version;
 		file_put_contents($this->installation_path.'/module.json', json_encode($module,JSON_PRETTY_PRINT));
         $this->installed_path = $this->installation_path;
