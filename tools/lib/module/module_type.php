@@ -46,6 +46,9 @@ class Module_type {
 				}
 			}
 		}
+		if(isset($dependencies['node'])) {
+			`npm update`;
+		}
 		$module['dependencies'] = $dependencies;
 		$map = array();
 		$module['map'] = $map;
@@ -56,6 +59,10 @@ class Module_type {
 		if(file_exists($this->installation_path.'/prebuild.php')) {
 			`php $this->installation_path/prebuild.php`;
 			unlink($this->installation_path.'/prebuild.php');
+		}
+		
+		if(file_exists($this->installation_path.'/__CORE__')) {
+			
 		}
 		
 		if(file_exists($this->installation_path.'/dbchanges')){
@@ -79,7 +86,7 @@ class Module_type {
 			file_put_contents($changeLogTargetPath, $changeToAppend);
 			
 			`php dbchanges/liquibase/update.php`;
-			`npm update`;
+			
 			Module_utils::remove_full_directory($dbchangesPath);	
 		}
 		if(file_exists($this->installation_path.'/core')) {

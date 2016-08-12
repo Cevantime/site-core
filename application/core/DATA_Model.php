@@ -337,17 +337,10 @@ abstract class DATA_Model extends CI_Model {
 		if ($uploadPaths) {
 			$files = $_FILES;
 			$this->load->library('upload');
-			if (is_array($uploadPaths)) {
-				foreach ($files as $key => $filedata) {
-					$uploadPath = isset($uploadPaths[$key]) ? $uploadPaths[$key] : '';
-					$this->doUpload($datas, $uploadPath, $key);
-				}
-			} else {
-				foreach ($files as $key => $filedata) {
-					$uploadPath = $uploadPaths;
-					$this->doUpload($datas, $uploadPath, $key);
-				}
+			foreach ($uploadPaths as $key => $uploadPath) {
+				$this->doUpload($datas, $uploadPath, $key);
 			}
+			
 		}
 		$this->addErrors($this->upload->error_msg);
 		if ($datas) {
@@ -356,7 +349,7 @@ abstract class DATA_Model extends CI_Model {
 		return $this->save($this->filterInvalidFields($_POST));
 	}
 
-	private function doUpload(&$datas, $uploadPath, $key) {
+	protected function doUpload(&$datas, $uploadPath, $key) {
 		$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
 		if ($this->upload->do_upload($key)) {
 			if ($datas) {
@@ -568,7 +561,7 @@ abstract class DATA_Model extends CI_Model {
 	public function filterInvalidFields(&$datas) {
 		$schema = $this->getSchema();
 		foreach ($datas as $key => $data) {
-			if (empty($data) || !in_array($key, $schema)) {
+			if (!in_array($key, $schema)) {
 				unset($datas[$key]);
 			}
 		}
