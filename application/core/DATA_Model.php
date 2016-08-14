@@ -352,7 +352,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	protected function doUpload(&$datas, $uploadPath, $key) {
-		if($_FILES[$key]) {
+		if(isset($_FILES[$key]) && $_FILES[$key]['tmp_name']) {
 			$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
 			if ($this->upload->do_upload($key)) {
 				if ($datas) {
