@@ -249,6 +249,8 @@ class Core_CLI {
 
 		Core_utils::full_move("$name/site-core/system", "$basepath/system");
 		rename("$name/site-core/application/core/DATA_Model.php", "$basepath/application/core/DATA_Model.php");
+		Core_utils::full_move("$name/site-core/gulpfile.js", "$basepath/gulpfile.js");
+		Core_utils::full_move("$name/site-core/tools", "$basepath/tools");
 		Core_utils::full_move("$name/site-core/application/helpers", "$basepath/application/helpers");
 		Core_utils::full_move("$name/site-core/application/models", "$basepath/application/models");
 		Core_utils::full_move("$name/site-core/application/libraries", "$basepath/application/libraries");

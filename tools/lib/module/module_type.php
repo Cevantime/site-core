@@ -109,7 +109,7 @@ class Module_type {
 		if(file_exists($this->installation_path.'/__CORE__')) {
 			$this->put_in_module_map($this->installation_path.'/__CORE__', $module['map']);
 			$core_path = '.';
-			Module_utils::full_move($this->installation_path.'/__CORE__/*', $core_path);
+			Module_utils::full_move($this->installation_path.'/__CORE__', $core_path);
 			Module_utils::remove_full_directory($this->installation_path.'/__CORE__');
 		}
 		

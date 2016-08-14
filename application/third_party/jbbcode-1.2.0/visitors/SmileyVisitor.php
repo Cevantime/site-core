@@ -53,11 +53,11 @@ class SmileyVisitor implements \JBBCode\NodeVisitor {
 
 	function visitTextNode(\JBBCode\TextNode $textNode) {
 		/* Conversion tag bbcode en image */
-		if($textNode->getParent()->getTagName() != 'sectioncode'){
+		if($textNode->getParent()->getTagName() != 'code'){
 			foreach ($this->tableauCode as $codeSmiley => $nomImage) {
 				$textNode->setValue(
 						str_replace($codeSmiley, 
-								'<img src="' . base_url() .'js/sceditor/emoticons/'. $nomImage . '" alt="' . $codeSmiley . '" />', 
+								'<img src="' . base_url() .'assets/vendor/images/smilies/'. $nomImage . '" alt="' . $codeSmiley . '" />', 
 								$textNode->getValue()
 								)
 						);

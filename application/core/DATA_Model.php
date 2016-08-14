@@ -338,11 +338,13 @@ abstract class DATA_Model extends CI_Model {
 			$files = $_FILES;
 			$this->load->library('upload');
 			foreach ($uploadPaths as $key => $uploadPath) {
-				$this->doUpload($datas, $uploadPath, $key);
+				if(!$this->doUpload($datas, $uploadPath, $key)){
+					$this->addErrors($this->upload->error_msg);
+					return false;
+				}
 			}
-			
+			$this->addErrors($this->upload->error_msg);
 		}
-		$this->addErrors($this->upload->error_msg);
 		if ($datas) {
 			return $this->save($this->filterInvalidFields($datas));
 		}
@@ -350,14 +352,20 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	protected function doUpload(&$datas, $uploadPath, $key) {
-		$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
-		if ($this->upload->do_upload($key)) {
-			if ($datas) {
-				$datas[$key] = $uploadPath . '/' . $this->upload->file_name;
+		if($_FILES[$key]) {
+			$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
+			if ($this->upload->do_upload($key)) {
+				if ($datas) {
+					$datas[$key] = $uploadPath . '/' . $this->upload->file_name;
+				} else {
+					$_POST[$key] = $uploadPath . '/' . $this->upload->file_name;
+				}
 			} else {
-				$_POST[$key] = $uploadPath . '/' . $this->upload->file_name;
+				return false;
 			}
+			
 		}
+		return true;
 	}
 
 	public function getLastErrors() {
