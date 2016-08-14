@@ -16,7 +16,7 @@ module.exports = function(env) {
   })
 
   var rev = config.tasks.production.rev && env === 'production'
-  var filenamePattern = rev ? '[name]-[hash].js' : '[name].js'
+  var filenamePattern = rev ? '[name].js' : '[name].js'
 
   var webpackConfig = {
     context: jsSrc,
