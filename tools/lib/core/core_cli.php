@@ -236,8 +236,8 @@ class Core_CLI {
 		$cmd = '';
 		$cmd .= "git init $name;";
 		$cmd .= "cd $name;";
-
-		$cmd .= 'git clone ' . CORE_SOURCE . ';';
+		$sep = Core_utils::os_sep();
+		$cmd .= 'git clone -b site-core-2 ' . CORE_SOURCE .' '. $sep;
 
 		Core_utils::line("executing : $cmd");
 		exec($cmd);
@@ -255,7 +255,6 @@ class Core_CLI {
 		Core_utils::full_move("$name/site-core/application/models", "$basepath/application/models");
 		Core_utils::full_move("$name/site-core/application/libraries", "$basepath/application/libraries");
 		Core_utils::full_move("$name/site-core/application/third_party", "$basepath/application/third_party");
-		Core_utils::full_move("$name/site-core/tools", "$basepath/tools");
 		Core_utils::remove_full_directory($name);
 
 		Core_utils::notice('Update successfull - You\'re on fire!');
