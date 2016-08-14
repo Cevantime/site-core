@@ -17,68 +17,65 @@ class BBCodeParser extends JBBCode\Parser {
 	public function __construct() {
 		parent::__construct();
 		$this->addCodeDefinitionSet(new JBBCode\DefaultCodeDefinitionSet());
-		
-		$builder = new JBBCode\CodeDefinitionBuilder('sectioncode', '<pre class="brush: {option}; toolbar: false; first-line: 1; class-name: \'my_personnal_code\'">{param}</pre>');
+
+
+		$builder = new JBBCode\CodeDefinitionBuilder('code', '<pre><code class="{option}">{param}</code></pre>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
 
-		$builder = new JBBCode\CodeDefinitionBuilder('code', '<pre class="brush: {option}; toolbar: false; first-line: 1; class-name: \'my_personnal_code\'">{param}</pre>');
-//		$builder->setUseOption(true);
-		$this->addCodeDefinition($builder->build());
-		
 		$builder = new JBBCode\CodeDefinitionBuilder('image', '<img src="{option}" alt="{param}"/>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
-		$builder = new JBBCode\CodeDefinitionBuilder('size','<span>{param}</span>');
+
+		$builder = new JBBCode\CodeDefinitionBuilder('size', '<span>{param}</span>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
-		$builder = new JBBCode\CodeDefinitionBuilder('font','<span style="font-family={option}">{param}</span>');
+
+		$builder = new JBBCode\CodeDefinitionBuilder('font', '<span style="font-family={option}">{param}</span>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('internallink', '<a href="{option}" target="_self">{param}</a>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('legend', '<p class="code-legend">{param}</p>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('externalink', '<a href="{option}" target="_blank">{param}</a>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('zip', '<a href="{option}" target="_blank" class="ziplink resourcelink">{param}</a>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('pdf', '<a href="{option}" target="_blank" class="pdflink resourcelink">{param}</a>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('quote', '<blockquote><cite class="quoteFrom">{option}</cite>{param}</blockquote>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
 
 		$builder = new JBBCode\CodeDefinitionBuilder('becareful', '<becareful class="alert alert-warning">{param}</becareful>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('info', '<info class="alert alert-info">{param}</info>');
 		$this->addCodeDefinition($builder->build());
 
 		$builder = new JBBCode\CodeDefinitionBuilder('retourligne', '<br/>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('left', '<div align="left">{param}</div>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('leftedCode', '<div class="code-left">{param}</div>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('center', '<div align="center">{param}</div>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('justify', '<div align="justify">{param}</div>');
 		$this->addCodeDefinition($builder->build());
 
@@ -89,50 +86,50 @@ class BBCodeParser extends JBBCode\Parser {
 
 		$builder = new JBBCode\CodeDefinitionBuilder('h3', '<h3 class="section" >{param}</h2>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('h4', '<h4 class="section" >{param}</h2>');
 		$this->addCodeDefinition($builder->build());
 
 		$builder = new JBBCode\CodeDefinitionBuilder('p', '<p>{param}</p>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('ol', '<ol>{param}</ol>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('list', '<ul>{param}</ul>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('list', '<ol>{param}</ol>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('*', '<li>{param}</li>');
 		$this->addCodeDefinition($builder->build());
 		$builder = new JBBCode\CodeDefinitionBuilder('li', '<li>{param}</li>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('youtube', '<iframe width="560" height="315" src="{param}" frameborder="0" allowfullscreen></iframe>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('video', '<iframe id="player" type="text/html" \n\
                 width="560" height="315" src="http://www.youtube.com/embed/{param}?enablejsapi=1" \n\
                 frameborder="0"></iframe>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('a', '<a href="{option}" target="_blank">{param}</a>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('table', '<table class="{option}">{param}</table>');
 		$builder->setUseOption(true);
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('td', '<td>{param}</td>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('tr', '<tr>{param}</tr>');
 		$this->addCodeDefinition($builder->build());
-		
+
 		$builder = new JBBCode\CodeDefinitionBuilder('br', '<br/>');
 		$this->addCodeDefinition($builder->build());
 	}
@@ -144,7 +141,20 @@ class BBCodeParser extends JBBCode\Parser {
 		$str = preg_replace($regex, "[p]$1[/p]\r\n", $str . "\r\n");
 		$str = preg_replace($regex2, "$1$2$5\r\n", $str);
 		$str = html_escape($str);
-		parent::parse($str);
+		$newstr = '';
+		$min = 0;
+		$max = 0;
+		while (($min = strpos($str, '[code', $min)) !== FALSE) {
+			$newstr .= substr($str, $max, $min - $max);
+			$max = strpos($str, '[/code]', $min);
+			if ($max === FALSE) {
+				break;
+			}
+			$newstr .= str_replace('[p]', '', str_replace('[/p]', '', substr($str, $min, $max - $min)));
+			$min = $max;
+		}
+		$newstr .= substr($str, $max, strlen($str) - $max - 1);
+		parent::parse($newstr);
 		$treeRoot = &$this->treeRoot;
 		$i = 0;
 		$chren = $treeRoot->getChildren();

@@ -6,7 +6,7 @@ echo "running liquibase\n";
 exec('php dbchanges/liquibase/update.php');
 echo "executing node update";
 exec('npm update');
-exec "composer update";
+echo "composer update";
 exec('php tools/composer self-update');
 exec('php tools/composer update --working-dir=application/');
 echo 'updating assets'

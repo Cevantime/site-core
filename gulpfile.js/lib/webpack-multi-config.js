@@ -46,12 +46,12 @@ module.exports = function(env) {
       config.tasks.javascript.entries[key] = ['webpack-hot-middleware/client?&reload=true'].concat(entry)
     }
 
-    webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin())
   }
 
   if(env !== 'test') {
     // Karma doesn't need entry points or output settings
     webpackConfig.entry = config.tasks.javascript.entries
+    webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin())
 
     webpackConfig.output= {
       path: path.normalize(jsDest),
