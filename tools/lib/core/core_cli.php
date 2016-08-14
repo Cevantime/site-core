@@ -244,7 +244,7 @@ class Core_CLI {
 
 
 		if (!file_exists("$name/site-core/application")) {
-			throw new Core_exception('Ooops. It seems that the core couldn\'t be installed');
+			throw new Core_exception('Ooops. It seems that the core couldn\'t be updated');
 		}
 
 		Core_utils::full_move("$name/site-core/system", "$basepath/system");
