@@ -9,8 +9,6 @@ exec('npm update');
 exec "composer update";
 exec('php tools/composer self-update');
 exec('php tools/composer update --working-dir=application/');
-echo 'updating core';
-exec('php tools/core update');
 echo 'updating assets'
 exec('./node_modules/.bin/gulp production');
 if (file_exists('./application/modules/traductions')) {
