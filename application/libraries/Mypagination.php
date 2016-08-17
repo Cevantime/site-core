@@ -90,7 +90,7 @@ class Mypagination {
 		. "</script>\n";
 	}
 	
-	public function getPagination($id, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li'){
+	public function getPagination($id, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li', $class = 'pagination'){
 		if(!isset($this->paginations[$id])) return '';
 		if(!$target_action){
 			$target_action = current_url();
@@ -103,7 +103,7 @@ class Mypagination {
 		if($hasStart !== FALSE) $target = substr($target_action, 0, $hasStart);
 		else $target = $target_action;
 		if ($max > 0) {
-			$html = '<'.$mainWraper.' class="pagination" id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
+			$html = '<'.$mainWraper.' class="'.$class.'" id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
 			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
 				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '/start/' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
 			}
@@ -112,7 +112,7 @@ class Mypagination {
 		else return '';
 		return $html;
 	}
-	public function getPaginationAjax($id, $container = null, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li'){
+	public function getPaginationAjax($id, $container = null, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li', $class='pagination paginationAjax'){
 		if(!isset($this->paginations[$id])) return '';
 		if(!$target_action){
 			$target_action = current_url();
@@ -129,7 +129,7 @@ class Mypagination {
 		if($hasStart !== FALSE) $target = substr($target_action, 0, $hasStart);
 		else $target = $target_action;
 		if ($max > 0) {
-			$html = '<'.$mainWraper.' class="pagination paginationAjax"'.$data_container.' id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
+			$html = '<'.$mainWraper.' class="'.$class.'"'.$data_container.' id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
 			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
 				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '/start/' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
 			}

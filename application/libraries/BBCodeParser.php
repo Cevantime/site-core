@@ -154,6 +154,7 @@ class BBCodeParser extends JBBCode\Parser {
 			$min = $max;
 		}
 		$newstr .= substr($str, $max, strlen($str) - $max - 1);
+		$newstr = str_replace('[p][/p]', '', $newstr);
 		parent::parse($newstr);
 		$treeRoot = &$this->treeRoot;
 		$i = 0;
