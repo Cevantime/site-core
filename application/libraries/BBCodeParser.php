@@ -132,6 +132,7 @@ class BBCodeParser extends JBBCode\Parser {
 
 		$builder = new JBBCode\CodeDefinitionBuilder('br', '<br/>');
 		$this->addCodeDefinition($builder->build());
+		
 	}
 
 	public function parse($str) {

@@ -58,37 +58,6 @@ class Mypagination {
 		return $models;
 	}
 	
-	public function getScriptPaginationForId($id_pagination) {
-		return "<script type='text/javascript'>\n"
-				. "var pagination = $('.pagination#pagination-$id_pagination');\n"
-				. "var dataContainer = pagination.data('container');\n"
-				. "if(dataContainer === 'undefined') {\n"
-					. "container = pagination.parent();\n"
-				. "} else {\n"
-					. "container = $(dataContainer);\n"
-				. "}"
-				. "var linksPagination = pagination.find('a');\n"
-				. "linksPagination.click(function(e){\n"
-					. "e.preventDefault();"
-					. "var target_action = $(this).attr('href');\n"
-					. "$.ajax({\n"
-						. "url: target_action,\n"
-						. "success : function(html){\n"
-							. "var height = container.height();"
-							. "container.replaceWith(html);\n"
-							. "if(dataContainer === 'undefined') {\n"
-								. "container = pagination.parent();\n"
-							. "} else {\n"
-								. "container = $(dataContainer);\n"
-							. "}"
-							. "$('html,body').animate({"
-								. "scrollTop :$('html,body').scrollTop() + container.height() - height"
-							. "}, 'fast');"
-						. "}\n"
-					. "});\n"
-				. "})\n"
-		. "</script>\n";
-	}
 	
 	public function getPagination($id, $target_action = null, $amplitude = 2, $jump = 1,$mainWraper='ul', $subWrapper = 'li', $class = 'pagination'){
 		if(!isset($this->paginations[$id])) return '';
@@ -99,15 +68,16 @@ class Mypagination {
 		$start = $pagination['start'];
 		$offset = $pagination['offset'];
 		$max = $pagination['max'];
-		$hasStart = strpos($target_action, '/start/');
-		if($hasStart !== FALSE) $target = substr($target_action, 0, $hasStart);
-		else $target = $target_action;
+		$target = $target_action;
+//		$hasStart = strpos($target_action, '/start/');
+//		if($hasStart !== FALSE) $target = substr($target_action, 0, $hasStart);
+//		else $target = $target_action;
 		if ($max > 0) {
-			$html = '<'.$mainWraper.' class="'.$class.'" id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
+			$html = '<'.$mainWraper.' class="'.$class.'" id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '?page_start=' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
 			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
-				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '/start/' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
+				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '?page_start=' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
 			}
-			$html .= '<'.$subWrapper.'><a href="' . $target . '/start/' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
+			$html .= '<'.$subWrapper.'><a href="' . $target . '?page_start=' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
 		}
 		else return '';
 		return $html;
@@ -125,18 +95,15 @@ class Mypagination {
 		$start = $pagination['start'];
 		$offset = $pagination['offset'];
 		$max = $pagination['max'];
-		$hasStart = strpos($target_action, '/start/');
-		if($hasStart !== FALSE) $target = substr($target_action, 0, $hasStart);
-		else $target = $target_action;
+		$target = $target_action;
 		if ($max > 0) {
-			$html = '<'.$mainWraper.' class="'.$class.'"'.$data_container.' id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '/start/' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
+			$html = '<'.$mainWraper.' data-module="compiled/pagination" class="'.$class.'"'.$data_container.' id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '?page_start=' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
 			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
-				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '/start/' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
+				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '?page_start=' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
 			}
-			$html .= '<'.$subWrapper.'><a href="' . $target . '/start/' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
+			$html .= '<'.$subWrapper.'><a href="' . $target . '?page_start=' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
 		}
 		else return '';
-		$html .= $this->getScriptPaginationForId($id);
 		return $html;
 	}
 	

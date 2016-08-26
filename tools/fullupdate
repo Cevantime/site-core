@@ -9,7 +9,7 @@ exec('npm update');
 echo "composer update";
 exec('php tools/composer self-update');
 exec('php tools/composer update --working-dir=application/');
-echo 'updating assets'
+echo 'updating assets';
 exec('./node_modules/.bin/gulp production');
 if (file_exists('./application/modules/traductions')) {
 	define('BASEPATH', 'toto');
