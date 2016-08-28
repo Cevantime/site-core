@@ -241,6 +241,10 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return $columns;
 	}
+	
+	public function __call($name, $arguments) {
+		return call_user_func(array($this->db,$name), $arguments);
+	}
 
 //	protected function getFulltextColumns() {
 //		
@@ -569,7 +573,7 @@ abstract class DATA_Model extends CI_Model {
 	public function filterInvalidFields(&$datas) {
 		$schema = $this->getSchema();
 		foreach ($datas as $key => $data) {
-			if (!in_array($key, $schema)) {
+			if (!in_array($key, $schema)||empty($data)) {
 				unset($datas[$key]);
 			}
 		}

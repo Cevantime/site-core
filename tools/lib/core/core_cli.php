@@ -185,10 +185,10 @@ class Core_CLI {
 		$database = strtolower($database);
 		$database_hostname = Core_utils::scan('Database host (localhost/ip address) : ');
 		$root = Core_utils::scan('root username (probably root) : ');
-		$root_password = Core_utils::scan('root password : ');
+		$root_password = Core_utils::scan_silent('root password : ');
 		$database_database = Core_utils::scan('Database name : ');
 		$database_username = Core_utils::scan('Database user : ');
-		$database_password = Core_utils::scan('Database password : ');
+		$database_password = Core_utils::scan_silent('Database password : ');
 		try {
 			$dbh = new PDO("mysql:host=$database_hostname", $root, $root_password);
 
