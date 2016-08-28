@@ -243,7 +243,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 	
 	public function __call($name, $arguments) {
-		return call_user_func(array($this->db,$name), $arguments);
+		return call_user_func_array(array($this->db,$name), $arguments);
 	}
 
 //	protected function getFulltextColumns() {
