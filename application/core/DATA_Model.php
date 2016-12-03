@@ -33,32 +33,55 @@ abstract class DATA_Model extends CI_Model {
 		return $this->_modelName;
 	}
 
+	public function getCache($idCache) {
+
+		if(ENVIRONMENT == 'development') return false;
+		$this->load->driver('cache', array('adapter' => 'memcached', 'backup' => 'file'));
+		$fullId = 'model_' . get_class($this) . '_' . $idCache;
+		return $this->cache->get($fullId);
+	}
+
+	public function setCache($idCache, $datas, $time = 300) {
+		if(ENVIRONMENT == 'development') return false;
+		$this->load->driver('cache', array('adapter' => 'memcached', 'backup' => 'file'));
+		$fullId = 'model_' . get_class($this) . '_' . $idCache;
+		return $this->cache->save($fullId, $datas, $time);
+	}
+
 	public function getSchema($extended = true) {
 		if ($extended) {
 			if ($this->_extendedSchema === null) {
-				$this->_extendedSchema = array();
-				$tables = $this->getExtendedTables();
-				foreach ($tables as $table) {
-					$fields = $this->db->list_fields($this->db->dbprefix($table));
-					$cols = array();
-					foreach ($fields as $field) {
-						$cols[$table . '.' . $field] = $field;
+				$idCache = 'extended_schema';
+				if (!$this->_extendedSchema = $this->getCache($idCache)) {
+					$this->_extendedSchema = array();
+					$tables = $this->getExtendedTables();
+					foreach ($tables as $table) {
+						$fields = $this->db->list_fields($this->db->dbprefix($table));
+						$cols = array();
+						foreach ($fields as $field) {
+							$cols[$table . '.' . $field] = $field;
+						}
+						$this->_extendedSchema = array_merge($this->_extendedSchema, $cols);
 					}
-					$this->_extendedSchema = array_merge($this->_extendedSchema, $cols);
+					$this->_extendedSchema = array_unique($this->_extendedSchema);
+					$this->setCache($idCache, $this->_extendedSchema);
 				}
-				$this->_extendedSchema = array_unique($this->_extendedSchema);
 			}
 			return $this->_extendedSchema;
 		} else {
 			if ($this->_schema === null) {
-				$this->_schema = array();
-				$table = $this->getTableName();
-				$fields = $this->db->list_fields($this->db->dbprefix($table));
-				$cols = array();
-				foreach ($fields as $field) {
-					$cols[] = $field;
+				$idCache = 'schema';
+				if (!$this->_schema = $this->getCache($idCache)) {
+					$this->_schema = array();
+					$table = $this->getTableName();
+					$fields = $this->db->list_fields($this->db->dbprefix($table));
+					$cols = array();
+					foreach ($fields as $field) {
+						$cols[] = $field;
+					}
+					$this->_schema = array_merge($this->_schema, $cols);
+					$this->setCache($idCache, $this->_schema);
 				}
-				$this->_schema = array_merge($this->_schema, $cols);
 			}
 			return $this->_schema;
 		}
@@ -241,10 +264,6 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return $columns;
 	}
-	
-	public function __call($name, $arguments) {
-		return call_user_func_array(array($this->db,$name), $arguments);
-	}
 
 //	protected function getFulltextColumns() {
 //		
@@ -342,7 +361,7 @@ abstract class DATA_Model extends CI_Model {
 			$files = $_FILES;
 			$this->load->library('upload');
 			foreach ($uploadPaths as $key => $uploadPath) {
-				if(!$this->doUpload($datas, $uploadPath, $key)){
+				if (!$this->doUpload($datas, $uploadPath, $key)) {
 					$this->addErrors($this->upload->error_msg);
 					return false;
 				}
@@ -356,7 +375,7 @@ abstract class DATA_Model extends CI_Model {
 	}
 
 	protected function doUpload(&$datas, $uploadPath, $key) {
-		if(isset($_FILES[$key]) && $_FILES[$key]['tmp_name']) {
+		if (isset($_FILES[$key]) && $_FILES[$key]['tmp_name']) {
 			$this->upload->initialize(array('upload_path' => './' . $uploadPath, 'allowed_types' => '*', 'file_name' => uniqid()));
 			if ($this->upload->do_upload($key)) {
 				if ($datas) {
@@ -367,7 +386,6 @@ abstract class DATA_Model extends CI_Model {
 			} else {
 				return false;
 			}
-			
 		}
 		return true;
 	}
@@ -375,48 +393,55 @@ abstract class DATA_Model extends CI_Model {
 	public function getLastErrors() {
 		return $this->_lastValidationErrors;
 	}
-	
-	public function getLastErrorsString($prefix= '<p>',$suffix = '</p>') {
-		// Generate the error string
-        $str = '';
-        foreach ($this->_lastValidationErrors as $val)
-        {
-            if ($val !== '')
-            {
-                //if field has more than one error, then all will be listed
-                if (is_array($val))
-                {
-                    foreach ($val as $v)
-                    {
-                        $str .= $prefix . $v . $suffix . "\n";
-                    }
-                }
-                else
-                {
-                    $str .= $prefix . $val . $suffix . "\n";
-                }
 
-            }
-        }
+	public function getLastErrorsString($prefix = '<p>', $suffix = '</p>') {
+		// Generate the error string
+		$str = '';
+		foreach ($this->_lastValidationErrors as $val) {
+			if ($val !== '') {
+				//if field has more than one error, then all will be listed
+				if (is_array($val)) {
+					foreach ($val as $v) {
+						$str .= $prefix . $v . $suffix . "\n";
+					}
+				} else {
+					$str .= $prefix . $val . $suffix . "\n";
+				}
+			}
+		}
 
 		return $str;
 	}
-	
+
 	private function addErrors($errors) {
-		$this->_lastValidationErrors = array_merge($this->_lastValidationErrors,$errors);
+		$this->_lastValidationErrors = array_merge($this->_lastValidationErrors, $errors);
 	}
-	
+
 	private function resetErrors() {
 		$this->_lastValidationErrors = array();
+	}
+	
+	public function getCompileQueryMode() {
+		return $this->_compileQueryOnly;
 	}
 
 	public function get($where = null, $type = 'object', $columns = null) {
 		$this->prepareGet($where, $type, $columns);
+
+		$sql = $this->db->get_compiled_select();
 		
-		if ($this->_compileQueryOnly) {
-			return $this->db->get_compiled_select();
+		return $this->query($sql,$type);
+	}
+	
+	protected function query($query,$type = 'object') {
+		if($this->_compileQueryOnly) {
+			return $query;
 		}
-		$query = $this->db->get();
+		$res= $this->db->query($query);
+		return $this->getResult($res,$type);
+	}
+
+	protected function getResult($query, $type = 'object') {
 		$numRows = $query->num_rows();
 		if ($numRows) {
 			$res = $query->result($type);
@@ -457,7 +482,7 @@ abstract class DATA_Model extends CI_Model {
 	public function prepareGet($where = array(), $type = 'object', $columns = null) {
 		$this->makeExtendedJoins();
 		if (!$columns) {
-			$columns = array($this->db->dbprefix($this->getTableName()).'.*');
+			$columns = array($this->db->dbprefix($this->getTableName()) . '.*');
 		} else if (is_string($columns)) {
 			$columns = array($columns);
 		}
@@ -549,18 +574,18 @@ abstract class DATA_Model extends CI_Model {
 		}
 		return $array;
 	}
-	
+
 	public function toObject() {
 		$obj = new stdClass();
 		foreach ($this->_datas as $key => $value) {
-			$field= array_pop(explode('.', $key));
+			$field = array_pop(explode('.', $key));
 			$obj->{$field} = $value;
 		}
 		return $obj;
 	}
 
 	public function __get($key) {
-		if (isset($this->_datas[$this->getTableName() . '.' . $key])) {
+		if (array_key_exists($this->getTableName() . '.' . $key, $this->_datas)) {
 			return $this->_datas[$this->getTableName() . '.' . $key];
 		}
 		return parent::__get($key);
@@ -573,7 +598,7 @@ abstract class DATA_Model extends CI_Model {
 	public function filterInvalidFields(&$datas) {
 		$schema = $this->getSchema();
 		foreach ($datas as $key => $data) {
-			if (!in_array($key, $schema)||empty($data)) {
+			if (!in_array($key, $schema) || $data === '') {
 				unset($datas[$key]);
 			}
 		}
@@ -630,7 +655,7 @@ abstract class DATA_Model extends CI_Model {
 		}
 		$key = $primaryCols[0];
 		$datas[$key] = $insertedId;
-		
+
 		for ($i = 1; $i < count($extendedTables); $i++) {
 			$table = $extendedTables[$i];
 			$model = strtolower($extendedClasses[$i]);
@@ -982,7 +1007,7 @@ abstract class DATA_Model extends CI_Model {
         FROM {PRE}' . $this->getTableName() . '
 		WHERE {PRE}' . $this->getTableName() . '.' . $order . ' >= ' . $this->db->escape($this->{$order}) . '';
 		$res = $this->db->query($query)->result();
-		
+
 		return $res[0]->count;
 	}
 
@@ -1031,14 +1056,14 @@ abstract class DATA_Model extends CI_Model {
 			}
 		}
 	}
-	
+
 	public function getLastSavedDatas() {
 		return $this->_lastSavedDatas;
 	}
 
-	public function getThrough($table, $model, $value, $key = 'id') {
+	public function getThrough($linkT, $refModel, $value, $key = 'id') {
 		$db = $this->db;
-		$linkTable = $db->dbprefix($table);
+		$linkTable = $db->dbprefix($linkT);
 		if (is_array($value)) {
 			if (!$value)
 				return array();
@@ -1046,29 +1071,33 @@ abstract class DATA_Model extends CI_Model {
 				return $db->escape($e);
 			}, $value);
 		}
-		return $this->get($key . ' IN ('
+		return $this->get($this->getTableName().'.'.$key . ' IN ('
 						. 'SELECT ' . strtolower(get_class($this)) . '_' . $key . ' '
 						. 'FROM ' . $linkTable . ' '
-						. 'WHERE ' . $model . '_' . $key . ' '
+						. 'WHERE ' . $refModel . '_' . $key . ' '
 						. (is_array($value) ? 'IN (' . implode(',', $value) . ')' : '= ' . $this->db->escape($value)) . ')');
 	}
 
 	public function columnsToTranslate() {
-		if($this->_columnsToTranslate === null){
+		if ($this->_columnsToTranslate === null) {
 			$this->_columnsToTranslate = array();
-			$tableTrads = $this->db->dbprefix($this->getTableName().'_translations');
-			if($this->db->table_exists($tableTrads)){
+			$tableTrads = $this->db->dbprefix($this->getTableName() . '_translations');
+			if ($this->db->table_exists($tableTrads)) {
 				$fieldsTrad = $fields = $this->db->list_fields($tableTrads);
 				$schema = $this->getSchema();
 				foreach ($schema as $field) {
-					if(in_array($field.'_lang', $fieldsTrad)) {
+					if (in_array($field . '_lang', $fieldsTrad)) {
 						$this->_columnsToTranslate[] = $field;
 					}
 				}
 			}
 		}
-		
+
 		return $this->_columnsToTranslate;
+	}
+
+	public function __call($name, $arguments) {
+		return call_user_func_array(array($this->db, $name), $arguments);
 	}
 
 //	private function hasAlias() {

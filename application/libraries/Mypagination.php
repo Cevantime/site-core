@@ -37,7 +37,7 @@ class Mypagination {
 		$query = $model->$methodName($dep, $offset);
 		$model->compileQueryOnly(false);
 		// adding the SQL_CALC_FOUND_ROWS option
-		$query = substr($query, 0, 6).' SQL_CALC_FOUND_ROWS '.substr($query, 7);
+		$query = 'SELECT SQL_CALC_FOUND_ROWS * FROM ('.$query.') as derived';
 		$models = $model->db->query($query)->result('object');
 		if(!$models) {
 			$models = array();

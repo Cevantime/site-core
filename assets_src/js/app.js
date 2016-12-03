@@ -3,12 +3,12 @@
   specifying module file-names.
 */
 
-const moduleElements = document.querySelectorAll('[data-module]')
+var moduleElements = document.querySelectorAll('[data-module]')
 
 for (var i = 0; i < moduleElements.length; i++) {
-  const el = moduleElements[i]
-  const name = el.getAttribute('data-module')
-  const Module = require(`./src/${name}`).default
+  var el = moduleElements[i];
+  var name = el.getAttribute('data-module');
+  var Module = require('./src/'.name).default;
 }
 /*
   Usage:
