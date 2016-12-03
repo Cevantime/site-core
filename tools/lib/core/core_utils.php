@@ -48,6 +48,27 @@ class Core_utils {
 		closedir($dir);
 	}
 
+	static function full_copy($src, $dst) {
+		if (is_dir($source)) {
+			$dir_handle = opendir($source);
+			while ($file = readdir($dir_handle)) {
+				if ($file != "." && $file != "..") {
+					if (is_dir($source . "/" . $file)) {
+						if (!is_dir($dest . "/" . $file)) {
+							mkdir($dest . "/" . $file);
+						}
+						self::full_copy($source . "/" . $file, $dest . "/" . $file);
+					} else {
+						copy($source . "/" . $file, $dest . "/" . $file);
+					}
+				}
+			}
+			closedir($dir_handle);
+		} else {
+			copy($source, $dest);
+		}
+	}
+
 	static function list_files_and_directories($dir) {
 		$scan = scandir($dir);
 		$files = array();
@@ -134,11 +155,11 @@ class Core_utils {
 	}
 
 	static function scan_silent($label) {
-		if(self::is_os('windows')){
+		if (self::is_os('windows')) {
 			return self::scan($label);
 		}
 		if (preg_match('/^win/i', PHP_OS)) {
-			
+
 			// for windows xp and windows 2003
 			$vbscript = sys_get_temp_dir() . 'prompt_password.vbs';
 			file_put_contents(

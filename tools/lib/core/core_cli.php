@@ -181,6 +181,7 @@ class Core_CLI {
 		Core_utils::line("The script will now install your new database. It assumes you use a mysql database.");
 		$app_env = Core_utils::scan('Your APPLICATION_ENV (alto/thibault/production etc.) :');
 		//putenv('APPLICATION_ENV=default');
+		Core_utils::full_copy('./dbchanges/liquibase/update.dist.php', './dbchanges/liquibase/update.php');
 		Core_utils::sed('./dbchanges/liquibase/update.php', "#putenv\('APPLICATION_ENV=(.*?)'\)#", "putenv('APPLICATION_ENV=$app_env')");
 		$database = strtolower($database);
 		$database_hostname = Core_utils::scan('Database host (localhost/ip address) : ');
