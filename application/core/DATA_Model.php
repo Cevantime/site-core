@@ -981,7 +981,7 @@ abstract class DATA_Model extends CI_Model {
 		return $res[0]->count;
 	}
 
-	protected function createAliasFrom($str, $update = FALSE) {
+	protected function createAliasFrom($str) {
 		$str = str_replace('+', 'plus', $str);
 		$str = str_replace('#', 'sharp', $str);
 		$str = str_replace(array('\'', '"'), array('-', '-'), $str);
@@ -997,10 +997,8 @@ abstract class DATA_Model extends CI_Model {
 		$this->db->from($this->getTableName());
 		$this->db->where('alias', $alias);
 		$count = $this->db->count_all_results();
-		$lim = ($update) ? 1 : 0;
-		if ($count > $lim) {
-			return $alias . '-' . $count;
-		}
+		$lim = 0;
+		
 
 		return $alias;
 	}
