@@ -30,10 +30,9 @@ if (!function_exists('locale')) {
 		}
 		else if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
 			locale($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-			return locale();
 		} else {
 			locale('fr');
-			return locale();
 		}
+		return locale();
 	}
 }

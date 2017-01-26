@@ -40,11 +40,11 @@ if (!defined('BASEPATH'))
  */
 if (!function_exists('translate')) {
 
-	function translate($french) {
-		if(!is_module_installed('traductions')) return $french;
+	function translate($origin) {
+		if(!is_module_installed('traductions')) return $origin;
 		$CI =& get_instance();
 		$CI->load->library('traductions/traductor');
-		return $CI->traductor->translate($french);
+		return $CI->traductor->translate($origin);
 	}
 
 }

@@ -552,7 +552,7 @@ class MY_Form_validation extends CI_Form_validation
         $ext_groups = array();
         $ext_groups['image'] = array('jpg', 'jpeg', 'gif', 'png');
         $ext_groups['image_icon'] = array('jpg', 'jpeg', 'gif', 'png', 'ico', 'image/x-icon');
-        $ext_groups['application'] = array('exe', 'dll', 'so', 'cgi');
+        $ext_groups['application'] = array('exe', 'dll', 'so', 'cgi', 'pdf');
         $ext_groups['php_code'] = array('php', 'php4', 'php5', 'inc', 'phtml');
         $ext_groups['word_document'] = array('rtf', 'doc', 'docx');
         $ext_groups['compressed'] = array('zip', 'gzip', 'tar', 'gz');

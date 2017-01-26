@@ -10,7 +10,7 @@ if (!function_exists('requires_module')) {
 
 	function requires_module($moduleName) {
 		
-		if(!file_exists(APPPATH.'/modules/'.$moduleName)){
+		if(!is_module_installed($moduleName)){
 			die('This script you want to execute requires the module '.$moduleName.'. Please install this module.');
 		}
 	}
