@@ -37,7 +37,7 @@ class Mypagination {
 		$query = $model->$methodName($dep, $offset);
 		$model->compileQueryOnly(false);
 		// adding the SQL_CALC_FOUND_ROWS option
-		$query = 'SELECT SQL_CALC_FOUND_ROWS * FROM ('.$query.') as derived';
+		$query = substr($query, 0, 6).' SQL_CALC_FOUND_ROWS '.substr($query, 7);
 		$models = $model->db->query($query)->result('object');
 		if(!$models) {
 			$models = array();
@@ -74,7 +74,7 @@ class Mypagination {
 //		else $target = $target_action;
 		if ($max > 0) {
 			$html = '<'.$mainWraper.' class="'.$class.'" id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '?page_start=' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
-			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
+			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $start + $amplitude); $i++) {
 				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '?page_start=' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
 			}
 			$html .= '<'.$subWrapper.'><a href="' . $target . '?page_start=' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';
@@ -98,7 +98,7 @@ class Mypagination {
 		$target = $target_action;
 		if ($max > 0) {
 			$html = '<'.$mainWraper.' data-module="compiled/pagination" class="'.$class.'"'.$data_container.' id="pagination-'.$id.'"><'.$subWrapper.'><a href="' . $target . '?page_start=' . max(0, $start - $amplitude - $jump) . '">&laquo;</a></'.$subWrapper.'>';
-			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $max + $amplitude); $i++) {
+			for ($i = max(0, $start - $amplitude); $i <= min($max / $offset, $start + $amplitude); $i++) {
 				$html .= '<'.$subWrapper.' ' . (($i == $start) ? 'class="active"' : '') . '><a href="' . $target . '?page_start=' . $i . '">' . ($i + 1) . '</a></'.$subWrapper.'>';
 			}
 			$html .= '<'.$subWrapper.'><a href="' . $target . '?page_start=' . min(intval($max / $offset), $max + $amplitude + $jump) . '">&raquo;</a></'.$subWrapper.'></'.$mainWraper.'>';

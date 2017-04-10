@@ -8,10 +8,10 @@
 
 if (!function_exists('config')) {
 
-	function config($key) {
+	function config($key, $default = null) {
 		$CI =& get_instance();
 		$CI->load->model('configuration');
-		return $CI->configuration->getValue($key);
+		return $CI->configuration->getValue($key, $default);
 	}
 
 }
