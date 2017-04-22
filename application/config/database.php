@@ -67,22 +67,3 @@ $db['default']['swap_pre'] = '{PRE}';
 $db['default']['autoinit'] = TRUE;
 $db['default']['stricton'] = FALSE;
 
-/* End of file database.php */
-/* Location: ./application/config/database.php */
-
-
-$db['thibault']['hostname'] = 'localhost';
-$db['thibault']['username'] = 'site-core-test';
-$db['thibault']['password'] = 'site-core-test';
-$db['thibault']['database'] = 'site-core-test';
-$db['thibault']['dbdriver'] =  'mysqli';
-$db['thibault']['dbprefix'] =  '';
-$db['thibault']['pconnect'] =  FALSE;
-$db['thibault']['db_debug'] =  TRUE;
-$db['thibault']['cache_on'] =  FALSE;
-$db['thibault']['cachedir'] =  '';
-$db['thibault']['char_set'] =  'utf8';
-$db['thibault']['dbcollat'] =  'utf8_general_ci';
-$db['thibault']['swap_pre'] =  '{PRE}';
-$db['thibault']['autoinit'] =  TRUE;
-$db['thibault']['stricton'] =  FALSE;
