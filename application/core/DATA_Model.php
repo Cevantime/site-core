@@ -765,7 +765,6 @@ abstract class DATA_Model extends CI_Model {
 		if ($datas == null) {
 			$datas = $this->toArray();
 		}
-		$this->convertArrayColumnsToJson($datas);
 		if ($this->updateDatas($datas)) {
 			return $this->update($datas, $where);
 		} else {
